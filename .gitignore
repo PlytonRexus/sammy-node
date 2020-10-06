@@ -1,0 +1,16 @@
+uploads/tmp/*
+uploads/jpg/*
+uploads/wav/*
+shaash.cp
+shaash.cpp
+ts.cpp
+wire.cpp
+nonr2-7.txt
+make.sh
+iofi.cpp
+node_modules
+binaries/samples
+binaries/scorers/*.scorer
+binaries/models/*.pbmm
+binaries/videos/*.mp4
+.env
