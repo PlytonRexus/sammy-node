@@ -1,11 +1,41 @@
 const path = require ('path');
 
+const atools = require ('../utils/atools');
 const wtools = require ('../utils/wtools');
 const xtools = require ('../utils/xtools');
 const vtools = require ('../utils/vtools');
 
 exports.getByUrl = async function(req, res) {
-	
+	let q = req.query,
+		url = "";
+
+	if (q.url) {
+		url = (q.url);
+	}
+
+	if (url == "") {
+		if (process.env.DEBUG_SAM) 
+			console.log("getByUrl route error: Empty URL parameter.");
+		res.json({ "error": "Empty query. Please supply a parameter." });
+	} else {
+		try {
+			let vidAddr = await wtools.fetchVideo(url);
+			if (process.env.DEBUG_SAM) 
+				console.log("File downloaded.", vidAddr);
+			let wavAddr = await xtools.extractAV(vidAddr);
+			if (process.env.DEBUG_SAM) 
+				console.log("Audio extracted.", wavAddr);
+			let wordsInWav = await atools.Ds_Wrap(null, null, wavAddr);
+
+			if (process.env.DEBUG_SAM && process.env.VERBOSE_SAM) 
+				console.log("Final response of getByUrl route:", wordsInWav);
+			res.json(wordsInWav);
+
+			// - [ ] now delete the files
+		} catch (e) {
+			res.json({ "error": e });
+		}
+	}
 }
 
 /**
@@ -21,7 +51,32 @@ exports.getByUrl = async function(req, res) {
  * @returns response: 202 || 400
  */
 exports.getByUpload = async (req, res, next) => {
-	
+	if (!req.file) {
+		if (process.env.DEBUG_SAM) 
+			console.log("getByUpload error: ", "File missing.");
+		return res.status(400).json({ "message": "No file selected!" });
+	}
+
+	// - [x] save file here
+	// - [x] then call deepspeech
+	// - [x] respond with the returned json array
+
+	try {
+		let wavAddr = 
+			await xtools.extractAV(
+				path.join(__dirname, "..", "uploads", "tmp", req.currentFilename)
+		);
+		if (process.env.DEBUG_SAM) 
+			console.log("Audio extracted.", wavAddr);
+		let wordsInWav = await atools.Ds_Wrap(null, null, wavAddr);
+
+		if (process.env.DEBUG_SAM && process.env.VERBOSE_SAM) 
+			console.log("Final response for getByUpload route:", wordsInWav); 
+		res.json(wordsInWav);
+		// - [ ] now delete the files
+	} catch (e) {
+		next(e);
+	}
 }
 
 
@@ -35,6 +90,11 @@ exports.getByUpload = async (req, res, next) => {
  * @returns response: 500
  */
 exports.uploadErrors = (err, req, res, next) => {
+	if (process.env.DEBUG_SAM) 
+		console.log("Error in getByUpload route.");
+	if (process.env.DEBUG_SAM && process.env.VERBOSE_SAM)
+		console.log(err); 
+	return res.status(500).json({ "message": err });
 }
 
 exports.describe = async (req, res) => {
