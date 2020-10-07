@@ -47,14 +47,14 @@ exports.fetchVideo = function (url) {
                 // Not sure what status codes are returned when.
                 // This seriously needs fixing.
 
-                // if (response.statusCode === 200) {
+                if (response.statusCode >= 200 && response.statusCode < 300) {
                     response.pipe(file);
-                // } 
-                // else {
-                //     file.close();
-                //     fs.unlink(dest, () => {}); // Delete temp file
-                //     reject(`Server responded with ${response.statusCode}: ${response.statusMessage}`);
-                // }
+                } 
+                else {
+                    file.close();
+                    fs.unlink(dest, () => {}); // Delete temp file
+                    reject(`Server responded with ${response.statusCode}: ${response.statusMessage}`);
+                }
             });
 
             request.on("error", err => {
@@ -64,6 +64,7 @@ exports.fetchVideo = function (url) {
             });
 
             file.on("finish", () => {
+                if (process.env.DEBUG_SAM) console.log("File downloaded.", dest);
                 resolve(dest);
             });
 
