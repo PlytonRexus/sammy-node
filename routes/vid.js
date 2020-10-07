@@ -14,7 +14,7 @@ const fileFilter = function fileFilter (req, file, callback)
     }
     else {
         callback(null, false);
-        console.log(chalk.yellow('Only wav file type is allowed!'));
+        console.log(chalk.yellow('Only mp4 file type is allowed!'));
     }
 }
 
@@ -43,5 +43,7 @@ router.post("/", upload.single("video"), vid.getByUpload, vid.uploadErrors);
 router.get("/", vid.getByUrl);
 
 router.get("/sd", vid.describe);
+
+router.post("/up", upload.single("video"), vid.describeByUpload);
 
 module.exports = router;
