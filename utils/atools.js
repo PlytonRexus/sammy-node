@@ -11,13 +11,13 @@ const { delay } = require ('./xtools');
 
 let modelPath = 
 	path.join(__dirname, "..", "binaries", "models", "deepspeech-0.8.1-models.pbmm");
-let scorerPath = 
-	path.join(__dirname, "..", "binaries", "scorers", "deepspeech-0.8.1-models.scorer");
+// let scorerPath = 
+	// path.join(__dirname, "..", "binaries", "scorers", "deepspeech-0.8.1-models.scorer");
 
 let model = new DeepSpeech.Model(modelPath);
 let desiredSampleRate = model.sampleRate();
 
-model.enableExternalScorer(scorerPath);
+// model.enableExternalScorer(scorerPath);
 
 const defaultRoot = path.join(__dirname, "..", "uploads", "wav");
 
