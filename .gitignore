@@ -14,3 +14,4 @@ binaries/scorers/*.scorer
 binaries/models/*.pbmm
 binaries/videos/*.mp4
 .env
+binaries/audios/*.wav
