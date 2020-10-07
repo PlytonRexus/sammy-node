@@ -1,7 +1,7 @@
 const express = require ('express');
 const multer = require ('multer');
 
-const wav = require ('./routes/wav');
+// const wav = require ('./routes/wav');
 const vid = require ('./routes/vid');
 const home = require ('./routes/home');
 const errors = require ('./routes/errors');
@@ -29,7 +29,7 @@ if (process.env.NODE_ENV == undefined || process.env.NODE_ENV == 'development') 
 }
 
 exp.use("", home);
-exp.use("/wav", wav);
+// exp.use("/wav", wav);
 exp.use("/vid", vid);
 
 exp.use(errors);
