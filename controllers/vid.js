@@ -41,7 +41,7 @@ exports.describeByUpload = async (req, res) => {
 	let vidAddr = req.currentFilename;
 	try {
 		let scenes = await vtools.extractScenes(vidAddr);
-		scenes.push(1.2);
+		scenes.unshift(0.6, 1.2);
 		if (process.env.DEBUG_SAM) console.log("Scene changes extracted.", scenes);
 
 		let frameObject = await vtools.extractFrames(vidAddr, scenes);
