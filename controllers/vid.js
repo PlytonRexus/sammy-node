@@ -99,7 +99,7 @@ exports.describe = async (req, res) => {
 		url = (q.url);
 	}
 
-	if (url == "") {
+	if (url == "") { 
 		if (process.env.DEBUG_SAM) console.log("`url` parameter empty.");
 		res.json({ "error": "Empty query. Please supply a parameter." });
 	} else { 
@@ -107,8 +107,13 @@ exports.describe = async (req, res) => {
 			let vidAddr = await wtools.fetchVideo(url);
 			if (process.env.DEBUG_SAM) console.log("File downloaded.", vidAddr);
 
+			let duration = await vtools.getDuration(vidAddr);
+			if (process.env.DEBUG_SAM) console.log("Obtained duration.", duration);
+
 			let scenes = await vtools.extractScenes(vidAddr);
 			scenes.unshift(0.6, 1.2);
+			if (duration) scenes.push(duration - 1.6, duration - 0.6);
+
 			if (process.env.DEBUG_SAM) console.log("Scene changes extracted.", scenes);
 
 			let frameObject = await vtools.extractFrames(vidAddr, scenes);

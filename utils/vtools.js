@@ -9,6 +9,23 @@ const fefq = require ('ffmpeg-extract-frames-quality');
 const deepai = require('deepai');
 // for OCR
 const tesseract = require("node-tesseract-ocr");
+// for duration
+const ffmpeg = require('fluent-ffmpeg');
+
+exports.getDuration = function (filePath) {
+	return new Promise((resolve, reject) => {
+		ffmpeg.ffprobe(filePath, (error, metadata) => {
+			if (error) {
+				if (process.env.DEBUG_SAM)
+					console.log("duration error:", error);
+				reject(error);
+			}
+			if (process.env.DEBUG_SAM && process.env.VERBOSE_SAM) 
+				console.log(metadata);
+			resolve(metadata.format.duration);
+		});
+	});
+}
 
 exports.extractScenes = function (filePath, filterSize = 0.1) {
 	return new Promise((resolve, reject) => {
