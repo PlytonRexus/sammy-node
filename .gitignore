@@ -1,7 +1,10 @@
 shaash.cp
-shaash.cpp
+/*.cpp
+a.out
+test_case_*.txt
 ts.cpp
 wire.cpp
+meet.js
 nonr2-7.txt
 make.sh
 iofi.cpp

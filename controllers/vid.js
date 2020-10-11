@@ -5,7 +5,7 @@ const xtools = require ('../utils/xtools');
 const vtools = require ('../utils/vtools');
 
 exports.getByUrl = async function(req, res) {
-	
+	res.json({ "Error": "This route has moved to a new address." });
 }
 
 /**
@@ -21,7 +21,7 @@ exports.getByUrl = async function(req, res) {
  * @returns response: 202 || 400
  */
 exports.getByUpload = async (req, res, next) => {
-	
+	res.json({ "Error": "This route has moved to a new address." });	
 }
 
 

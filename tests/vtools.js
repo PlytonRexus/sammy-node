@@ -1,5 +1,5 @@
 const vtools = require('../utils/vtools');
-const path = require ('path');
+const { join } = require ('path');
 
 const wtools = require ('../utils/wtools');
 const xtools = require ('../utils/xtools');
@@ -12,7 +12,8 @@ const xtools = require ('../utils/xtools');
 function responder(vidAddr) {
     return new Promise(async resolve => {
     	console.log(vidAddr);
-        let scenes = await vtools.extractScenes('/home/mihir/dev/clones/sm/uploads/tmp/video-1601998992335-886067872.mp4', 0.3);
+        let scenes = await vtools.extractScenes(
+            join(__dirname, '../uploads/tmp/ElephantsDream.mp4'), 0.3);
         scenes.push(1.2);
         if (process.env.DEBUG_SAM) console.log("Scene changes extracted.", scenes);
 
@@ -23,7 +24,7 @@ function responder(vidAddr) {
             compressed = [];
         while (i <= frameObject.numberOfFrames) {
             compressed.push(await xtools.sharpValidation(
-                path.join(
+                join(
                     __dirname,
                     "..",
                     "uploads",

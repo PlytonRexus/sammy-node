@@ -1,4 +1,4 @@
-const http = require ("https");
+const https = require ("https");
 const fs = require ('fs');
 const path = require ('path');
 
@@ -43,11 +43,13 @@ exports.fetchVideo = function (url) {
         return new Promise((resolve, reject) => {
             const file = fs.createWriteStream(dest, { flags: "wx" });
 
-            const request = http.get(url, response => {
+            const request = https.get(url, response => {
                 // Not sure what status codes are returned when.
                 // This seriously needs fixing.
 
                 if (response.statusCode >= 200 && response.statusCode < 300) {
+                    if (process.env.DEBUG_SAM) 
+                        console.log("Download started from " + urlv.href + ".");
                     response.pipe(file);
                 } 
                 else {
@@ -55,17 +57,18 @@ exports.fetchVideo = function (url) {
                     fs.unlink(dest, () => {}); // Delete temp file
                     reject(`Server responded with ${response.statusCode}: ${response.statusMessage}`);
                 }
-            });
-
-            request.on("error", err => {
+            }).on("error", err => {
                 file.close();
                 fs.unlink(dest, () => {}); // Delete temp file
                 reject(err.message);
             });
 
             file.on("finish", () => {
-                if (process.env.DEBUG_SAM) console.log("File downloaded.", dest);
-                resolve(dest);
+                file.close(() => {
+                    if (process.env.DEBUG_SAM) 
+                        console.log("File downloaded at:", dest);
+                    resolve(dest)
+                });
             });
 
             file.on("error", err => {
@@ -75,6 +78,7 @@ exports.fetchVideo = function (url) {
                     reject("File already exists");
                 } else {
                     fs.unlink(dest, () => {}); // Delete temp file
+                    console.log(err.message);
                     reject(err.message);
                 }
             });
