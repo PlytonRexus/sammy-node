@@ -1,8 +1,8 @@
 ffmpeg
 tesseract-ocr
 libvpx5
+pulseaudio
 libpulse0
 libpulse-dev
 libpulsedsp
 nano
-pulseaudio
