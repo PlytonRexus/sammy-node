@@ -1,4 +1,4 @@
-const vtools = require('../utils/vtools');
+const vtools = require ('../utils/vtools');
 const { join } = require ('path');
 
 const wtools = require ('../utils/wtools');
@@ -12,8 +12,7 @@ const xtools = require ('../utils/xtools');
 function responder(vidAddr) {
     return new Promise(async resolve => {
     	console.log(vidAddr);
-        let scenes = await vtools.extractScenes(
-            join(__dirname, '../uploads/tmp/ElephantsDream.mp4'), 0.3);
+        let scenes = await vtools.extractScenes(vidAddr, 0.05);
         scenes.push(1.2);
         if (process.env.DEBUG_SAM) console.log("Scene changes extracted.", scenes);
 
@@ -60,6 +59,6 @@ function responder(vidAddr) {
     });
 }
 
-responder()
+responder(join(__dirname, '../uploads/tmp/ElephantsDream.mp4'))
 .then(resp => console.log(resp))
 .catch(e => console.log(e));

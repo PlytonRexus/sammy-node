@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "./node_modules/.bin/env-cmd -f ./.env nodemon server.js",
-    "test": "./node_modules/.bin/env-cmd -f ./.env nodemon tests/vtool-tests.js",
+    "test": "./node_modules/.bin/env-cmd -f ./.env nodemon tests/vtools.js",
     "heroku-postbuild": "./.heroku/run.sh"
   },
   "keywords": [],
