@@ -21,7 +21,6 @@
     "@samuelcalegari/ds_ffmpeg": "^1.0.11",
     "chalk": "^4.1.0",
     "deepai": "^1.0.15",
-    "deepspeech": "^0.8.2",
     "express": "^4.17.1",
     "ffmpeg-extract-audio": "^1.0.2",
     "ffmpeg-extract-frames-quality": "^2.0.2",
