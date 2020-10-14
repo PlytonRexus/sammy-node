@@ -39,6 +39,8 @@ exports.uploadErrors = (err, req, res, next) => {
 
 exports.describeByUpload = async (req, res) => {
 	let vidAddr = req.currentFilename;
+	if (process.env.DEBUG_SAM)
+		console.log("Processing:", vidAddr);
 	try {
 		let scenes = await vtools.extractScenes(vidAddr);
 		scenes.unshift(0.6, 1.2);
