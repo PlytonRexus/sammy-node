@@ -112,9 +112,17 @@ exports.describe = async (req, res) => {
 			let duration = await vtools.getDuration(vidAddr);
 			if (process.env.DEBUG_SAM) console.log("Obtained duration.", duration);
 
-			let scenes = await vtools.extractScenes(vidAddr);
-			scenes.unshift(0.6, 1.2);
-			if (duration) scenes.push(duration - 1.6, duration - 0.6);
+			let scenes = [];
+			try {
+				scenes = await vtools.extractScenes(vidAddr);
+				scenes.unshift(0.6, 1.2);
+				if (duration) scenes.push(duration - 1.6, duration - 0.6);
+
+			} catch(e){
+				scenes  = [];
+				scenes.unshift(0.6, 1.2);
+				if (duration) scenes.push(duration - 1.6, duration - 0.6);
+			}
 
 			if (process.env.DEBUG_SAM) console.log("Scene changes extracted.", scenes);
 
