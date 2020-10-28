@@ -31,3 +31,10 @@
 ```sh
 	aptitude install ffmpeg
 ```
+
+## Heroku Instructions
+```sh
+heroku addons:create heroku-redis
+git push heroku main
+heroku ps:scale worker=1
+```

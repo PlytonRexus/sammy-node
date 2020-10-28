@@ -8,26 +8,31 @@
   "scripts": {
     "start": "node server.js",
     "dev": "./node_modules/.bin/env-cmd -f ./.env nodemon server.js",
+    "dev-proc": "./node_modules/.bin/env-cmd -f ./.env nf start",
     "test": "./node_modules/.bin/env-cmd -f ./.env nodemon tests/vtools.js",
     "heroku-postbuild": "./.heroku/run.sh"
   },
-  "keywords": [ 
-    "scene-recognition", 
-    "ocr", "asr", 
-    "optical-caracter-recognition", 
-    "speech-recognition" 
+  "keywords": [
+    "scene-recognition",
+    "ocr",
+    "asr",
+    "optical-caracter-recognition",
+    "speech-recognition"
   ],
   "dependencies": {
     "@samuelcalegari/ds_ffmpeg": "^1.0.11",
+    "bull": "^3.18.1",
     "chalk": "^4.1.0",
     "deepai": "^1.0.15",
     "express": "^4.17.1",
     "ffmpeg-extract-audio": "^1.0.2",
     "ffmpeg-extract-frames-quality": "^2.0.2",
+    "foreman": "^3.0.1",
     "multer": "^1.4.2",
     "node-tesseract-ocr": "^2.0.0",
     "sharp": "^0.26.1",
     "sox": "^0.1.0",
+    "throng": "^5.0.0",
     "ytdl-core": "^3.3.0"
   },
   "devDependencies": {

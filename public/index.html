@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Background Jobs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://www.herokucdn.com/purple3/latest/purple3.min.css">
+  <script src="client.js" async></script>
+</head>
+<body class="bg-near-white">
+  <script type="text/template" id="job-template">
+    <div class="flex flex-column ma2">
+      <div class="flex justify-between mb2">
+        <div class='mt2 mb1'><span class="hk-label">Job ID:</span> {{id}}</div>
+        <div class='mt2 mb1'><span class="hk-label">State:</span> {{state}}</div>
+      </div>
+      <div class="w-100 br1 shadow-inner-1 bg-light-silver">
+        <span class="db h1 br1 {{color}}" style="width: {{progress}}%;"></span>
+      </div>
+    </div>
+  </script>
+  <div class="shadow-3 pa4 tc f3">
+    It is possible that some jobs might just outright fail. If that happens, try using another video (preferrably a shorter one).
+  </div>
+  <div class="main-content flex flex-column justify-center items-center w-100 mt4">
+    <div class='br2 flex flex-column items-center pv3'>
+      <div class='f1 mt2 mb1'>Create long-running jobs</div>
+      <div class="flex mt2">
+          <form action="/vid/sd" method="POST" id='sd-form'>
+            <input type="url" id="sd-input" class="hk-input" style="margin-right: 60px" required>
+            <button id="add-job-sd" class='hk-button--primary' type="submit">Add URL Job</button>
+          </form> 
+      </div>
+      <div class="flex mt2">
+        <form method="POST" enctype="multipart/form-data" id="up-form" action="/vid/up">
+          <input type="file" id="up-input" accept="video/mp4" name="video" class="" required>
+          <button href='#' type="submit" id="add-job-up" class="hk-button--primary" data-url="/vid/up" data-mode="up">Add Upload Job</button>
+        </form>
+      </div>
+      <div class="flex mt2">
+        <button href='#' id="clear" class='hk-button--secondary'>Clear</button>
+      </div>
+    </div>
+    <div id="job-summary" class="w-80 f3"></div>
+    <div class="h6 flex flex-column justify-end">
+      <div class="shadow-3 pa4 tc f3">
+     Can take some time, especially if you've asked for the processing of a long video.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
