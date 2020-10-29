@@ -6,7 +6,7 @@
   "author": "Mihir Jichkar",
   "license": "MIT",
   "scripts": {
-    "start": "node server.js",
+    "start": "nf start",
     "dev": "./node_modules/.bin/env-cmd -f ./.env nodemon server.js",
     "dev-proc": "./node_modules/.bin/env-cmd -f ./.env nf start",
     "test": "./node_modules/.bin/env-cmd -f ./.env nodemon tests/vtools.js",
