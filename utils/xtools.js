@@ -114,3 +114,28 @@ exports.delay = function (ms) {
 	if (process.env.DEBUG_SAM) console.log("Waiting " + ms/1000 + " seconds.");
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+const deleteFile = function(filePath) {
+	return new Promise((resolve, reject) => {
+		fs.unlink(filePath, (err) => {
+			if (err) {
+    			console.error(err);
+    			reject(err);
+			};
+			resolve();
+		});
+	})
+}
+
+exports.deleteManyFiles = function(filePaths) {
+	return new Promise(async (resolve, reject) => {
+		if (!filePaths)
+			reject("No or invalid paths supplied.");
+		else {
+			for (let i = 0; i < filePaths.length; i++) {
+				await deleteFile(filePaths[i]);
+			};
+			resolve(filePaths);
+		}
+	})
+}

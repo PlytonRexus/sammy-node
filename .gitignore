@@ -15,4 +15,6 @@ binaries/models/*.pbmm
 binaries/videos/*.mp4
 .env
 binaries/audios/*.wav
+uploads/tmp/*.mp4
+uploads/jpg/*.jpg
 *.rdb

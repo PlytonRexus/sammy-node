@@ -1,15 +1,16 @@
 const path = require ('path');
 
-const wtools = require ('../utils/wtools');
-const xtools = require ('../utils/xtools');
-const vtools = require ('../utils/vtools');
+const Queue = require('bull');
+
+const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const sdQueue = new Queue('sd', REDIS_URL);
+const upQueue = new Queue('up', REDIS_URL);
 
 exports.getByUrl = async function(req, res) {
 	res.json({ "Error": "This route has moved to a new address." });
 }
 
 /**
- * Saves an uploaded avatar to specified user document.
  * Request body should contain a file of one of these mimetypes:
  * video/mp4, application/octet-stream
  * 
@@ -24,7 +25,6 @@ exports.getByUpload = async (req, res, next) => {
 	res.json({ "Error": "This route has moved to a new address." });	
 }
 
-
 /**
  * Responds with errors occured during uploading file.
  *
@@ -34,10 +34,41 @@ exports.getByUpload = async (req, res, next) => {
  * @param {*} next
  * @returns response: 500
  */
-exports.uploadErrors = (err, req, res, next) => {
+exports.uploadErrors = (error, req, res, next) => {	
+	res.json({ error });
 }
 
 exports.describeByUpload = async (req, res) => {
+	let job = await upQueue.add({ currentFilename: req.currentFilename });
+	res.json({ id: job.id });
+}
+
+exports.describe = async (req, res) => {
+	let job = await sdQueue.add({ url: req.query.url });
+	res.json({ id: job.id });
+}
+
+exports.status = async (req, res) => {
+    let id = req.params.id;
+    let job;
+    if (req.query.mode === "sd") {
+        job = await sdQueue.getJob(id);
+    } else if (req.query.mode === "up") {
+        job = await upQueue.getJob(id);
+    }
+
+    if (job === null || job === undefined) {
+        res.status(404).end();
+    } else {
+        let state = await job.getState();
+        let progress = job._progress;
+        let reason = job.failedReason;
+        let responseFinal = job.returnvalue;
+        res.json({ id, state, progress, reason, responseFinal });
+    }
+};
+
+/*up
 	let vidAddr = req.currentFilename;
 	if (process.env.DEBUG_SAM)
 		console.log("Processing:", vidAddr);
@@ -85,15 +116,16 @@ exports.describeByUpload = async (req, res) => {
 		let responseFinal = { "captions": captions, "ocr": ocrs };
 		if (process.env.DEBUG_SAM)
 			console.log("Final response: \n", responseFinal); 
-		res.json(responseFinal);
-
+		// res.json(responseFinal);
+		return responseFinal;
 		// - [ ] now delete the files
 	} catch (e) {
-		res.json({ "error": e });
+		// res.json({ "error": e });
+		return { error: e };
 	}
-}
+*/
 
-exports.describe = async (req, res) => {
+/*sd
 	let q = req.query,
 		url = "";
 
@@ -172,4 +204,4 @@ exports.describe = async (req, res) => {
 			res.json({ "error": e });
 		}
 	}
-}
+*/
