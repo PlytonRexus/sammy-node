@@ -33,7 +33,7 @@
     "sharp": "^0.26.1",
     "sox": "^0.1.0",
     "throng": "^5.0.0",
-    "ytdl-core": "^3.3.0"
+    "ytdl-core": "^4.0.0"
   },
   "devDependencies": {
     "env-cmd": "^10.1.0",

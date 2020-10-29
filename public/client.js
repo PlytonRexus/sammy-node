@@ -103,10 +103,11 @@ function renderJob(job) {
 
     return document.querySelector('#job-template')
         .innerHTML
-        .replace('{{id}}', job.id)
+        .replaceAll('{{id}}', job.id)
         .replace('{{state}}', job.state)
         .replace('{{color}}', color)
-        .replace('{{progress}}', progress);
+        .replace('{{progress}}', progress)
+        .replace('{{mode}}', job.mode);
 }
 
 // Attach click handlers and kick off background processes

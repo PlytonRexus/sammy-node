@@ -17,7 +17,7 @@ let workers = process.env.WEB_CONCURRENCY || 2;
 // to be tuned for your application. If each job is mostly waiting on network 
 // responses it can be much higher. If each job is CPU-intensive, it might need
 // to be much lower.
-let maxJobsPerWorker = 5;
+let maxJobsPerWorker = 10;
 
 function start() {
     // Connect to the named work queue
@@ -26,13 +26,16 @@ function start() {
 
     sdQueue.process(maxJobsPerWorker, async (job) => {
         let progress = 0,
-        	prog = [15, 20, 30, 50, 66, 80, 95, 100 ];
+        	prog = [15, 20, 30, 50, 66, 80, 92, 97, 100 ];
         	/* [ 
         		download, duration, 
         		scenes, frames, 
         		compression, captions, 
-        		OCR, finalise 
+        		OCR, delete, finalise 
         	] */
+
+        let toDelete = [];
+
         let q = job.data,
 			url = "";
 
@@ -47,6 +50,7 @@ function start() {
 			try {
 				let vidAddr = await wtools.fetchVideo(url);
 				if (process.env.DEBUG_SAM) console.log("File downloaded.", vidAddr);
+				toDelete.push(vidAddr);
 				for(;progress < prog[0]; progress += 1) job.progress(progress);
 
 				let duration = await vtools.getDuration(vidAddr);
@@ -75,14 +79,19 @@ function start() {
 
 				let i = 1, compressed = [];
 				while (i <= frameObject.numberOfFrames) {
-					compressed.push(await xtools.sharpValidation(
+					let imagePath = 
 						path.join(
 							__dirname, 
 							"uploads", 
 							"jpg", 
 							"frame-" + frameObject.suffix + `-${i}.jpg`
-						), "image/jpg"
-					));
+						);
+					let compressedImage = await xtools.sharpValidation(
+						imagePath, "image/jpg"
+					);
+
+					compressed.push(compressedImage);
+					toDelete.push(imagePath);
 					i += 1;
 				}
 				for(;progress < prog[4]; progress += 1) job.progress(progress);
@@ -99,26 +108,24 @@ function start() {
 
 				if (process.env.DEBUG_SAM) console.log("OCR complete.", ocrs);
 
-				// if (captions.length === scenes.length) {
-					captions = captions.map(function (cap, idx) {
-						return { time: Math.round(scenes[idx]*1000), captions: cap[0].caption };
-					});
-					ocrs = ocrs.map((line, idx) => { 
-						return { "time": Math.round(scenes[idx]*1000), "ocr": line }
-					});
-				// }
+				captions = captions.map(function (cap, idx) {
+					return { time: Math.round(scenes[idx]*1000), captions: cap[0].caption };
+				});
+				ocrs = ocrs.map((line, idx) => { 
+					return { "time": Math.round(scenes[idx]*1000), "ocr": line }
+				});
+
 				for(;progress < prog[7]; progress += 1) job.progress(progress);
 
 				let responseFinal = { "captions": captions, "ocr": ocrs };
 				if (process.env.DEBUG_SAM)
 					console.log("Final response: \n", responseFinal); 
-				// res.json(responseFinal);
 
-				// A job can return values that will be stored in Redis as JSON
+				await xtools.deleteManyFiles(toDelete);
+				job.progress(100);
+
 				job.data.responseFinal = responseFinal;
 				return responseFinal;
-
-				// - [ ] now delete the files
 			} catch (e) {
 				throw Error(e);
 			}
@@ -127,17 +134,19 @@ function start() {
 
     upQueue.process(maxJobsPerWorker, async (job) => {
         let progress = 0,
-        	prog = [ 10, 25, 40, 60, 75, 95, 100 ];
+        	prog = [ 10, 25, 40, 60, 75, 90, 97, 100 ];
         	/* [ 
         		duration, 
         		extract, frames, 
         		compression, captions, 
         		OCR, finalise 
         	] */
+        let toDelete = [];
 
         let vidAddr = job.data.currentFilename;
 		if (process.env.DEBUG_SAM)
 			console.log("Processing:", vidAddr);
+		toDelete.push(vidAddr);
 
 		let duration = await vtools.getDuration(vidAddr);
 		if (process.env.DEBUG_SAM) console.log("Obtained duration.", duration);
@@ -164,16 +173,21 @@ function start() {
 
 			let i = 1, compressed = [];
 			while (i <= frameObject.numberOfFrames) {
-				compressed.push(await xtools.sharpValidation(
-					path.join(
-						__dirname,  
-						"uploads", 
-						"jpg", 
-						"frame-" + frameObject.suffix + `-${i}.jpg`
-					), "image/jpg"
-				));
-				i += 1;
-			}
+					let imagePath = 
+						path.join(
+							__dirname, 
+							"uploads", 
+							"jpg", 
+							"frame-" + frameObject.suffix + `-${i}.jpg`
+						);
+					let compressedImage = await xtools.sharpValidation(
+						imagePath, "image/jpg"
+					);
+
+					compressed.push(compressedImage);
+					toDelete.push(imagePath);
+					i += 1;
+				}
 
 			if (process.env.DEBUG_SAM) console.log("Frames compressed.", compressed.length);
 			for(;progress < prog[3]; progress += 1) job.progress(progress);
@@ -200,6 +214,9 @@ function start() {
 			let responseFinal = { "captions": captions, "ocr": ocrs };
 			if (process.env.DEBUG_SAM)
 				console.log("Final response: \n", responseFinal); 
+
+			await xtools.deleteManyFiles(toDelete);
+			job.progress(100);
 			
 			job.data.responseFinal = responseFinal;
 			return responseFinal;
