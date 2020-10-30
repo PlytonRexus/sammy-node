@@ -11,6 +11,8 @@ const deepai = require('deepai');
 const tesseract = require("node-tesseract-ocr");
 // for duration
 const ffmpeg = require('fluent-ffmpeg');
+// for azure
+const fetch = require('node-fetch');
 
 exports.getDuration = function (filePath) {
 	return new Promise((resolve, reject) => {
@@ -128,5 +130,53 @@ exports.getOCR = function(filePath, filePaths) {
 				reject(err);
 			}
 		}
+	});
+}
+
+exports.getCaptionFromAzure = function(filePath, filePaths) {
+	return new Promise(async (resolve, reject) => {
+		async function getCaptionsForOne(p) {
+			const stats = fs.statSync(p);
+			const fileSizeInBytes = stats.size;
+			const { AZURE_CV_ENDPOINT:endpoint, AZURE_CV_KEY_1:apikey } = process.env;
+
+			// let readStream = await fs.createReadStream(p);
+			//var stringContent = fs.readFileSync(p, 'utf8');
+			let bufferContent = fs.readFileSync(p);
+
+			let res = await fetch(endpoint, {
+			    method: 'POST',
+			    headers: {
+			        "Content-length": fileSizeInBytes,
+			        "Ocp-Apim-Subscription-Key": apikey,
+			        "Content-Type": "application/octet-stream"
+			    },
+			    body: bufferContent
+			})
+		    return (await res.json());
+		}
+
+		if (filePath) {
+			try {
+				let rs  = await getCaptionsForOne(filePath);
+			    resolve({ caption: rs.description.captions[0] ? rs.description.captions[0].text : null, tags: rs.description.tags });
+			} catch (err) {
+				if (process.env.DEBUG_SAM) console.log("Azure API error:", err);
+				reject(err);
+			}
+		}
+		if (filePaths) {
+			let responses = [];
+			try {
+				for (let i = 0; i < filePaths.length; i ++) {
+					responses.push(await getCaptionsForOne(filePaths[i]));
+				}
+				resolve(responses.map(rs => ({ caption: rs.description.captions[0] ? rs.description.captions[0].text : null, tags: rs.description.tags })));
+			} catch (err) {
+				if (process.env.DEBUG_SAM) console.log("Azure API error:", err);
+				reject(err);
+			}
+		}
+
 	});
 }

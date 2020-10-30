@@ -42,17 +42,23 @@ exports.getByUpload = async (req, res, next) => {
  * @param {*} next
  * @returns response: 500
  */
-exports.uploadErrors = (error, req, res, next) => {	
+exports.uploadErrors = (error, req, res, next) => { 
 	res.json({ error });
 }
 
 exports.describeByUpload = async (req, res) => {
-	let job = await upQueue.add({ currentFilename: req.currentFilename });
+	let job = await upQueue.add({ 
+		currentFilename: req.currentFilename, 
+		describer: req.query.describer 
+	});
 	res.json({ id: job.id });
 }
 
 exports.describe = async (req, res) => {
-	let job = await sdQueue.add({ url: req.query.url });
+	let job = await sdQueue.add({ 
+		url: req.query.url, 
+		describer: req.query.describer
+	});
 	res.json({ id: job.id });
 }
 

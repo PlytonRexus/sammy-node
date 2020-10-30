@@ -62,8 +62,8 @@ exports.sharpValidation = async function (original, mimetype) {
 			if (process.env.DEBUG_SAM && process.env.VERBOSE_SAM) console.log("Compressing:", original);
 			buffer = await sharp(original)
 			.resize({
-				width: 500,
-				height: 500
+				width: 700,
+				height: 700
 			})
 			// .jpg(opts)
 			.toBuffer(function(err, buffer) {

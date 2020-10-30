@@ -115,7 +115,23 @@ function start() {
 				if (process.env.DEBUG_SAM) console.log("Frames compressed.", compressed.length);
 				job.log("Frames compressed. " + compressed.length);
 
-				let captions = await vtools.getCaption(null, compressed);
+				let captions = [];
+				let describer = q.describer || "azure";
+				if (q.describer == "densecap") {
+					captions = await vtools.getCaption(null, compressed);
+					captions = captions.map(function (cap, idx) {
+						return { time: Math.round(scenes[idx]*1000), captions: cap[0].caption };
+					});
+				} else {
+					captions = await vtools.getCaptionFromAzure(null, compressed);
+					captions = captions.map(function (cap, idx) {
+						return { 
+							time: Math.round(scenes[idx]*1000), 
+							captions: cap.caption, 
+							tags: cap.tags 
+						};
+					});
+				}
 				for(;progress < prog[5]; progress += 1) job.progress(progress);
 				if (process.env.DEBUG_SAM) console.log("Captions received.", captions.length);
 				job.log("Captions received. " + captions.length);
@@ -125,9 +141,6 @@ function start() {
 				if (process.env.DEBUG_SAM) console.log("OCR complete.", ocrs);
 				job.log("OCR complete. " + ocrs);
 
-				captions = captions.map(function (cap, idx) {
-					return { time: Math.round(scenes[idx]*1000), captions: cap[0].caption };
-				});
 				ocrs = ocrs.map((line, idx) => { 
 					return { "time": Math.round(scenes[idx]*1000), "ocr": line }
 				});
@@ -163,6 +176,7 @@ function start() {
         let toDelete = [];
 
         let vidAddr = job.data.currentFilename;
+        let q = job.data;
 		if (process.env.DEBUG_SAM)
 			console.log("Processing:", vidAddr);
 		job.log("Begin processing. " + vidAddr);
@@ -216,7 +230,23 @@ function start() {
 			job.log("Frames compressed. " + compressed.length);
 			for(;progress < prog[3]; progress += 1) job.progress(progress);
 
-			let captions = await vtools.getCaption(null, compressed);
+			let captions = [];
+			let describer = q.describer || "azure";
+			if (q.describer == "densecap") {
+				captions = await vtools.getCaption(null, compressed);
+				captions = captions.map(function (cap, idx) {
+					return { time: Math.round(scenes[idx]*1000), caption: cap[0].caption };
+				});
+			} else {
+				captions = await vtools.getCaptionFromAzure(null, compressed);
+				captions = captions.map(function (cap, idx) {
+					return { 
+						time: Math.round(scenes[idx]*1000), 
+						caption: cap.caption, 
+						tags: cap.tags 
+					};
+				});
+			}
 			if (process.env.DEBUG_SAM) console.log("Captions received.", captions.length);
 			job.log("Captions received. " + captions.length);
 			for(;progress < prog[4]; progress += 1) job.progress(progress);
@@ -226,9 +256,6 @@ function start() {
 			job.log("OCR complete. " + ocrs);
 			for(;progress < prog[5]; progress += 1) job.progress(progress);
 
-			captions = captions.map(function (cap, idx) {
-				return { time: Math.round(scenes[idx]*1000), captions: cap[0].caption };
-			});
 			ocrs = ocrs.map((line, idx) => { 
 				return { "time": Math.round(scenes[idx]*1000), "ocr": line }
 			});

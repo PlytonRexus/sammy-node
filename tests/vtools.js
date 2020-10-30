@@ -59,6 +59,34 @@ function responder(vidAddr) {
     });
 }
 
-responder(join(__dirname, '../uploads/tmp/ElephantsDream.mp4'))
-.then(resp => console.log(resp))
-.catch(e => console.log(e));
+// responder(join(__dirname, '../uploads/tmp/ElephantsDream.mp4'))
+// .then(resp => console.log(resp))
+// .catch(e => console.log(e));
+
+function testingAzureAPI() {
+    return new Promise(async (resolve, reject) => {
+        function getPath(name, i) {
+            return join(__dirname, "..", "uploads", "jpg", name + i + ".jpg");
+        }
+
+        let x = [],
+            i;
+        for (i = 1; i < 4; i ++) {
+            x.push(getPath("frame-1604067774538-460521942-", i));
+        }
+
+        console.log("x:", x);
+
+        try {
+            resolve(
+                await vtools
+                .getCaptionFromAzure(null, x));
+        } catch(e) {
+            reject(e);
+        }
+    });
+}
+
+testingAzureAPI()
+.then(json => console.log(json))
+.catch(e => console.error(e));
