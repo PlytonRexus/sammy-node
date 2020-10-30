@@ -15,10 +15,8 @@ const opts = {
 	}
 };
 if (process.env.DEBUG_SAM)
-	console.log(REDIS_URL);
+	console.log(REDIS_URL, process.env.REDIS_PASS);
 const sdQueue = new Queue('sd', REDIS_URL, opts);
-if (process.env.DEBUG_SAM)
-	console.log(sdQueue);
 const upQueue = new Queue('up', REDIS_URL, opts);
 
 const exp = express();
