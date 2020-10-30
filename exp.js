@@ -6,12 +6,18 @@ const job = require ('./routes/job');
 const errors = require ('./routes/errors');
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const opts = {
+	port: 6379,
+	host: '127.0.0.1',
+	db: 0,
+	password: process.env.REDIS_PASS
+}
 if (process.env.DEBUG_SAM)
 	console.log(REDIS_URL);
-const sdQueue = new Queue('sd', REDIS_URL);
+const sdQueue = new Queue('sd', opts);
 if (process.env.DEBUG_SAM)
 	console.log(sdQueue);
-const upQueue = new Queue('up', REDIS_URL);
+const upQueue = new Queue('up', opts);
 
 const exp = express();
 
