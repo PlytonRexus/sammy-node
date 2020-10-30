@@ -5,10 +5,10 @@ const Queue = require('bull');
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 const opts = {
 	redis: {
-		port: 13556,
-		host: "redis-13556.c240.us-east-1-3.ec2.cloud.redislabs.com" || '127.0.0.1',
+		port: process.env.REDIS_PORT || 6379,
+		host: process.env.REDIS_HOST || '127.0.0.1',
 		db: 0,
-		password: "4Wys3xSB^5pv"
+		password: process.env.REDIS_PASS
 	}
 };
 const sdQueue = new Queue('sd', opts);
