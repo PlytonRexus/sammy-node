@@ -24,6 +24,9 @@ function start() {
     let sdQueue = new Queue('sd', REDIS_URL);
     let upQueue = new Queue('up', REDIS_URL);
 
+    if (process.env.DEBUG_SAM)
+    	console.log("sdQueue:", sdQueue, "upQueue:", upQueue);
+
     sdQueue.process(maxJobsPerWorker, async (job) => {
         let progress = 0,
         	prog = [15, 20, 30, 50, 66, 80, 92, 97, 100 ];

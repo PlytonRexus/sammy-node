@@ -2,6 +2,7 @@ const express = require ('express');
 const Queue = require('bull');
 
 const vid = require ('./routes/vid');
+const job = require ('./routes/job');
 const errors = require ('./routes/errors');
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
@@ -33,6 +34,7 @@ if (process.env.NODE_ENV == undefined || process.env.NODE_ENV == 'development') 
 }
 
 exp.use("/vid", vid);
+exp.use("/job", job);
 
 // You can listen to global events to get notified when jobs are processed
 sdQueue.on('global:completed', (jobId, result) => {
