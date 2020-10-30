@@ -17,3 +17,4 @@ binaries/videos/*.mp4
 binaries/audios/*.wav
 uploads/tmp/*.mp4
 uploads/jpg/*.jpg
+*.rdb
