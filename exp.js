@@ -6,7 +6,11 @@ const job = require ('./routes/job');
 const errors = require ('./routes/errors');
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+if (process.env.DEBUG_SAM)
+	console.log(REDIS_URL);
 const sdQueue = new Queue('sd', REDIS_URL);
+if (process.env.DEBUG_SAM)
+	console.log(sdQueue);
 const upQueue = new Queue('up', REDIS_URL);
 
 const exp = express();
