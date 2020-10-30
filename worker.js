@@ -9,11 +9,13 @@ const vtools = require ('./utils/vtools');
 
 let REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
 const opts = {
-	port: 6379,
-	host: '127.0.0.1',
-	db: 1,
-	password: process.env.REDIS_PASS
-}
+	redis: {
+		port: 6379,
+		host: '127.0.0.1',
+		db: 1,
+		password: process.env.REDIS_PASS
+	}
+};
 
 // Spin up multiple processes to handle jobs to 
 // take advantage of more CPU cores

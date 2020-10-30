@@ -4,11 +4,13 @@ const Queue = require('bull');
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 const opts = {
-	port: 6379,
-	host: '127.0.0.1',
-	db: 1,
-	password: process.env.REDIS_PASS
-}
+	redis: {
+		port: 6379,
+		host: '127.0.0.1',
+		db: 1,
+		password: process.env.REDIS_PASS
+	}
+};
 const sdQueue = new Queue('sd', opts);
 const upQueue = new Queue('up', opts);
 
