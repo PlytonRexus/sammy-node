@@ -3,8 +3,14 @@ const path = require ('path');
 const Queue = require('bull');
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-const sdQueue = new Queue('sd', REDIS_URL);
-const upQueue = new Queue('up', REDIS_URL);
+const opts = {
+	port: 6379,
+	host: '127.0.0.1',
+	db: 1,
+	password: process.env.REDIS_PASS
+}
+const sdQueue = new Queue('sd', opts);
+const upQueue = new Queue('up', opts);
 
 exports.getByUrl = async function(req, res) {
 	res.json({ "Error": "This route has moved to a new address." });

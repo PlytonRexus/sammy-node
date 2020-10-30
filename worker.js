@@ -8,6 +8,12 @@ const xtools = require ('./utils/xtools');
 const vtools = require ('./utils/vtools');
 
 let REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
+const opts = {
+	port: 6379,
+	host: '127.0.0.1',
+	db: 1,
+	password: process.env.REDIS_PASS
+}
 
 // Spin up multiple processes to handle jobs to 
 // take advantage of more CPU cores
@@ -21,8 +27,8 @@ let maxJobsPerWorker = 10;
 
 function start() {
     // Connect to the named work queue
-    let sdQueue = new Queue('sd', REDIS_URL);
-    let upQueue = new Queue('up', REDIS_URL);
+    let sdQueue = new Queue('sd', opts);
+    let upQueue = new Queue('up', opts);
 
     if (process.env.DEBUG_SAM)
     	console.log("sdQueue:", sdQueue, "upQueue:", upQueue);
