@@ -56,7 +56,7 @@ exports.getLogs = async function(req, res) {
 exports.retryJob = async function(req, res) {
 	// Only for failed jobs
 
-	let mode = getMode(req).
+	let mode = getMode(req),
 		id = req.params.id;
 	try {
 		if (mode == "sd") {
@@ -74,7 +74,7 @@ exports.retryJob = async function(req, res) {
 }
 
 exports.removeJob = async function(req, res) {
-	let mode = getMode(req).
+	let mode = getMode(req),
 		id = req.params.id;
 	try {
 		if (mode == "sd") {
@@ -103,6 +103,22 @@ exports.restartQueue = async function(req, res) {
 		}
 
 		res.json({ "status": "Queue paused and resumed" });
+	} catch(e) {
+		res.status(500).json({ "Error": e });
+	}
+}
+
+exports.activateJob = async function(req, res) {
+	let mode = getMode(req),
+		id = req.params.id;
+	try {
+		if (mode == "sd") {
+			await sdQueue.moveToActive(id);
+		} else if (mode == "up") {
+			await upQueue.moveToActive(id);
+		}
+
+		res.json({ "status": "Moved" });
 	} catch(e) {
 		res.status(500).json({ "Error": e });
 	}
