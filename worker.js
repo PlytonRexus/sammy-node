@@ -10,10 +10,10 @@ const vtools = require ('./utils/vtools');
 let REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
 const opts = {
 	redis: {
-		port: 6379,
-		host: '127.0.0.1',
-		db: 1,
-		password: process.env.REDIS_PASS
+		port: 13556,
+		host: "redis-13556.c240.us-east-1-3.ec2.cloud.redislabs.com" || '127.0.0.1',
+		db: 0,
+		password: "4Wys3xSB^5pv"
 	}
 };
 
@@ -28,8 +28,8 @@ let workers = process.env.WEB_CONCURRENCY || 2;
 let maxJobsPerWorker = 10;
 
 // Connect to the named work queue
-let sdQueue = new Queue('sd', REDIS_URL, opts);
-let upQueue = new Queue('up', REDIS_URL, opts);
+let sdQueue = new Queue('sd', opts);
+let upQueue = new Queue('up', opts);
 
 function start() {
 
