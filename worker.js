@@ -27,10 +27,11 @@ let workers = process.env.WEB_CONCURRENCY || 2;
 // to be much lower.
 let maxJobsPerWorker = 10;
 
+// Connect to the named work queue
+let sdQueue = new Queue('sd', REDIS_URL, opts);
+let upQueue = new Queue('up', REDIS_URL, opts);
+
 function start() {
-    // Connect to the named work queue
-    let sdQueue = new Queue('sd', opts);
-    let upQueue = new Queue('up', opts);
 
     if (process.env.DEBUG_SAM)
     	console.log("sdQueue:", sdQueue, "upQueue:", upQueue);

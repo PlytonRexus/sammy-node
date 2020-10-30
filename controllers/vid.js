@@ -11,8 +11,8 @@ const opts = {
 		password: process.env.REDIS_PASS
 	}
 };
-const sdQueue = new Queue('sd', opts);
-const upQueue = new Queue('up', opts);
+const sdQueue = new Queue('sd', REDIS_URL, opts);
+const upQueue = new Queue('up', REDIS_URL, opts);
 
 exports.getByUrl = async function(req, res) {
 	res.json({ "Error": "This route has moved to a new address." });
