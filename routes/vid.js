@@ -44,8 +44,6 @@ const upload = multer({
     storage
 });
 
-router.get('/:id', vid.status);
-
 router.post("/sd", wtools.reqTimeout, vid.describe);
 
 router.post("/up",

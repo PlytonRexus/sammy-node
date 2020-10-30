@@ -55,7 +55,7 @@ async function sdSubmitHandler(e) {
 // Fetch updates for each job
 async function updateJobs() {
     for (let id of Object.keys(jobs)) {
-        let res = await fetch(`/vid/${id}?mode=${jobs[id].mode}`);
+        let res = await fetch(`/job/${id}/status?mode=${jobs[id].mode}`);
         let result = await res.json();
         if (!!jobs[id]) {
             jobs[id].state = result.state;

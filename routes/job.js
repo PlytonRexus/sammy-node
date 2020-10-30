@@ -4,6 +4,8 @@ const job = require('../controllers/job');
 
 const router = express.Router();
 
+router.get('/:id/status', job.status);
+
 router.get("/:id/logs", job.getLogs);
 
 router.get("/:id/retry", job.retryJob);

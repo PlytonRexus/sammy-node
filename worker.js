@@ -57,16 +57,19 @@ function start() {
 
 		if (url == "") { 
 			if (process.env.DEBUG_SAM) console.log("`url` parameter empty.");
+			job.log("`url` parameter empty.");
 			throw Error({ "error": "Empty query. Please supply a parameter." });
 		} else { 
 			try {
 				let vidAddr = await wtools.fetchVideo(url);
 				if (process.env.DEBUG_SAM) console.log("File downloaded.", vidAddr);
+				job.log("File downloaded. " + vidAddr);
 				toDelete.push(vidAddr);
 				for(;progress < prog[0]; progress += 1) job.progress(progress);
 
 				let duration = await vtools.getDuration(vidAddr);
 				if (process.env.DEBUG_SAM) console.log("Obtained duration.", duration);
+				job.log("Obtained duration. " + duration);
 				for(;progress < prog[1]; progress += 1) job.progress(progress);
 
 				let scenes = [];
@@ -81,10 +84,12 @@ function start() {
 					if (duration) scenes.push(duration - 1.6, duration - 0.6);
 				}
 				if (process.env.DEBUG_SAM) console.log("Scene changes extracted.", scenes);
+				job.log("Scene changes extracted. " + scenes);
 				for(;progress < prog[2]; progress += 1) job.progress(progress);
 
 				let frameObject = await vtools.extractFrames(vidAddr, scenes);
 				if (process.env.DEBUG_SAM) console.log("Frames extracted.", frameObject);
+				job.log("Frames extracted. " + frameObject);
 				// for(;progress < prog[3]; progress += 1) job.progress(progress);
 				progress = 50;
 				job.progress(progress);
@@ -107,18 +112,18 @@ function start() {
 					i += 1;
 				}
 				for(;progress < prog[4]; progress += 1) job.progress(progress);
-
 				if (process.env.DEBUG_SAM) console.log("Frames compressed.", compressed.length);
+				job.log("Frames compressed. " + compressed.length);
 
 				let captions = await vtools.getCaption(null, compressed);
 				for(;progress < prog[5]; progress += 1) job.progress(progress);
-
 				if (process.env.DEBUG_SAM) console.log("Captions received.", captions.length);
+				job.log("Captions received. " + captions.length);
 
 				let ocrs = await vtools.getOCR(null, compressed);
 				for(;progress < prog[6]; progress += 1) job.progress(progress);
-
 				if (process.env.DEBUG_SAM) console.log("OCR complete.", ocrs);
+				job.log("OCR complete. " + ocrs);
 
 				captions = captions.map(function (cap, idx) {
 					return { time: Math.round(scenes[idx]*1000), captions: cap[0].caption };
@@ -130,10 +135,12 @@ function start() {
 				for(;progress < prog[7]; progress += 1) job.progress(progress);
 
 				let responseFinal = { "captions": captions, "ocr": ocrs };
-				if (process.env.DEBUG_SAM)
-					console.log("Final response: \n", responseFinal); 
+				if (process.env.DEBUG_SAM && process.env.DEBUG_VERBOSE)
+					console.log("Final response: \n", responseFinal);
+				job.log("Final response ready.");
 
 				await xtools.deleteManyFiles(toDelete);
+				job.log("Deleting residual files.");
 				job.progress(100);
 
 				job.data.responseFinal = responseFinal;
@@ -158,10 +165,12 @@ function start() {
         let vidAddr = job.data.currentFilename;
 		if (process.env.DEBUG_SAM)
 			console.log("Processing:", vidAddr);
+		job.log("Begin processing. " + vidAddr);
 		toDelete.push(vidAddr);
 
 		let duration = await vtools.getDuration(vidAddr);
 		if (process.env.DEBUG_SAM) console.log("Obtained duration.", duration);
+		job.log("Obtained duration. " + duration);
 		for(;progress < prog[0]; progress += 1) job.progress(progress);
 
 		try {
@@ -177,10 +186,12 @@ function start() {
 				if (duration) scenes.push(duration - 1.6, duration - 0.6);
 			}
 			if (process.env.DEBUG_SAM) console.log("Scene changes extracted.", scenes);
+			job.log("Scene changes extracted. " + scenes);
 			for(;progress < prog[1]; progress += 1) job.progress(progress);
 
 			let frameObject = await vtools.extractFrames(vidAddr, scenes);
 			if (process.env.DEBUG_SAM) console.log("Frames extracted.", frameObject);
+			job.log("Frames extracted. " + frameObject);
 			for(;progress < prog[2]; progress += 1) job.progress(progress);
 
 			let i = 1, compressed = [];
@@ -202,32 +213,34 @@ function start() {
 				}
 
 			if (process.env.DEBUG_SAM) console.log("Frames compressed.", compressed.length);
+			job.log("Frames compressed. " + compressed.length);
 			for(;progress < prog[3]; progress += 1) job.progress(progress);
 
 			let captions = await vtools.getCaption(null, compressed);
 			if (process.env.DEBUG_SAM) console.log("Captions received.", captions.length);
+			job.log("Captions received. " + captions.length);
 			for(;progress < prog[4]; progress += 1) job.progress(progress);
 
 			let ocrs = await vtools.getOCR(null, compressed);
 			if (process.env.DEBUG_SAM) console.log("OCR complete.", ocrs);
+			job.log("OCR complete. " + ocrs);
 			for(;progress < prog[5]; progress += 1) job.progress(progress);
 
-			// if (captions.length === scenes.length) {
-				captions = captions.map(function (cap, idx) {
-					return { time: Math.round(scenes[idx]*1000), captions: cap[0].caption };
-				});
-				ocrs = ocrs.map((line, idx) => { 
-					return { "time": Math.round(scenes[idx]*1000), "ocr": line }
-				});
-			// }
-
+			captions = captions.map(function (cap, idx) {
+				return { time: Math.round(scenes[idx]*1000), captions: cap[0].caption };
+			});
+			ocrs = ocrs.map((line, idx) => { 
+				return { "time": Math.round(scenes[idx]*1000), "ocr": line }
+			});
 			for(;progress < prog[6]; progress += 1) job.progress(progress);
 
 			let responseFinal = { "captions": captions, "ocr": ocrs };
-			if (process.env.DEBUG_SAM)
+			if (process.env.DEBUG_SAM && process.env.DEBUG_VERBOSE)
 				console.log("Final response: \n", responseFinal); 
+			job.log("Final response ready.");
 
 			await xtools.deleteManyFiles(toDelete);
+			job.log("Deleting residual files.");
 			job.progress(100);
 			
 			job.data.responseFinal = responseFinal;

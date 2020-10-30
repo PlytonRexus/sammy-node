@@ -123,3 +123,23 @@ exports.activateJob = async function(req, res) {
 		res.status(500).json({ "Error": e });
 	}
 }
+
+exports.status = async (req, res) => {
+    let id = req.params.id;
+    let job;
+    if (req.query.mode === "sd") {
+        job = await sdQueue.getJob(id);
+    } else if (req.query.mode === "up") {
+        job = await upQueue.getJob(id);
+    }
+
+    if (job === null || job === undefined) {
+        res.status(404).end();
+    } else {
+        let state = await job.getState();
+        let progress = job._progress;
+        let reason = job.failedReason;
+        let responseFinal = job.returnvalue;
+        res.json({ id, state, progress, reason, responseFinal });
+    }
+};
