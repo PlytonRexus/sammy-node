@@ -116,5 +116,5 @@ window.onload = function() {
     document.querySelector("#up-form").addEventListener("submit", upSubmitHandler);
     document.querySelector("#clear").addEventListener("click", clear);
 
-    setInterval(updateJobs, 200);
+    setInterval(updateJobs, 400);
 };
