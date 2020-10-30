@@ -1,5 +1,12 @@
 {
   "addons": [
     "heroku-redis"
-  ]
+  ],
+  "environments": {
+  	"production": {
+  		"env": {
+  			"REDIS_VERSION": "6"
+  		}
+  	}
+  }
 }
