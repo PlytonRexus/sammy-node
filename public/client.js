@@ -1,6 +1,19 @@
 // Store for all of the jobs in progress
 let jobs = {};
 
+let lread = function(key) {
+    key = btoa(key);
+    let x = localStorage.getItem(key);
+    return x = atob(x);
+}
+
+let lkeep = function(key, value) {
+    key = btoa(key);
+    value = btoa(value);
+    localStorage.setItem(key, value);
+    return key;
+}
+
 async function upSubmitHandler(e) {
 	e.preventDefault();
 	var fd = new FormData();
@@ -22,7 +35,11 @@ async function upSubmitHandler(e) {
             submitBtn.disabled = false;
             submitBtn.innerHTML = orgHtml;
             let job = JSON.parse(request.response);
-            jobs[job.id] = { id: job.id, state: "queued", mode: "up" };
+
+            if(lread("debug") == "true")
+                console.log(job);
+
+            jobs[job.id] = { id: job.id1, state: "queued", mode: "up" };
             render();
         } else {
             console.log("Error!");
@@ -42,19 +59,25 @@ async function sdSubmitHandler(e) {
 	submitBtn.innerHTML = "Adding to queue";
 
 	let res = await fetch(e.target.action + "?url=" + url, { method: "POST" });
-	console.log(e.target.action + "?url=" + url);
+    if(lread("debug") == "true")
+	   console.log(e.target.action + "?url=" + url);
     let job = await res.json();
+
+    if(lread("debug") == "true")
+        console.log(job);
 
     submitBtn.disabled = false;
 	submitBtn.innerHTML = orgHtml;
 	
-    jobs[job.id] = { id: job.id, state: "queued", mode: "sd" };
+    jobs[job.id1] = { id: job.id1, state: "queued", mode: "sd" };
     render();
 }
 
 // Fetch updates for each job
 async function updateJobs() {
     for (let id of Object.keys(jobs)) {
+        if(lread("debug") == "true")
+            console.log(jobs[id]);
         let res = await fetch(`/job/${id}/status?mode=${jobs[id].mode}`);
         let result = await res.json();
         if (!!jobs[id]) {
@@ -79,9 +102,6 @@ function render() {
         s += renderJob(jobs[id]);
     }
 
-    // For demo simplicity this blows away all of the existing HTML and replaces it,
-    // which is very inefficient. In a production app a library like React or Vue should
-    // handle this work
     document.querySelector("#job-summary").innerHTML = s;
 }
 

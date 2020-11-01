@@ -3,6 +3,7 @@ const fs = require ('fs');
 const path = require ('path');
 
 const ytdl = require ("ytdl-core");
+const fetch = require ("node-fetch");
 
 exports.fetchVideo = function (url) {
     let urlv = new URL(url);
@@ -86,7 +87,36 @@ exports.fetchVideo = function (url) {
     }
 }
 
-exports.reqTimeout = function (req, res, next) {
-    req.setTimeout(parseInt(process.env.REQUEST_TIMEOUT, 10) * 60 * 1000);
+const addrToUrl = function(addr, origin = "https://sm-web2.herokuapp.com") {
+    let pathname = addr.match(/\/uploads\/tmp\/*/i);
+    if (!pathname)
+        return new URL(origin + pathname[0]);
+    return null;
+}
+
+exports.postAudioReq = async function(url, vidAddr) {
+    let urlv = new URL(url),
+        targetUrl = 'https://sammy-audio.herokuapp.com/vid/link';
+    if (vidAddr)
+        urlv = addrToUrl(vidAddr);
+    let finalUrl = `${targetUrl}?url=${urlv.href}`;
+
+    console.log("finalUrl:", `${targetUrl}?url=${urlv.href}`);
+    let res = await fetch(finalUrl, {
+        method: "POST",
+        headers: { 
+            "Content-Type": "application/json" 
+        }
+    });
+
+    res = await res.json();
+
+    console.log(res);
+
+    return (parseInt(res.id));
+}
+
+exports.reqTimeout = async function (req, res, next) {
+    req.setTimeout(parseInt(process.env.REQUEST_TIMEOUT || 30, 10) * 60 * 1000);
     next();
 }

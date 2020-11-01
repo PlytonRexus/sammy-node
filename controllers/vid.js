@@ -1,6 +1,8 @@
-const path = require ('path');
+const path = require('path');
 
 const Queue = require('bull');
+
+const { postAudioReq } = require('../utils/wtools');
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 const opts = {
@@ -42,7 +44,7 @@ exports.getByUpload = async (req, res, next) => {
  * @param {*} next
  * @returns response: 500
  */
-exports.uploadErrors = (error, req, res, next) => { 
+exports.uploadErrors = (error, req, res, next) => {
 	res.json({ error });
 }
 
@@ -51,7 +53,13 @@ exports.describeByUpload = async (req, res) => {
 		currentFilename: req.currentFilename, 
 		describer: req.query.describer 
 	});
-	res.json({ id: job.id });
+	let requestAudio = true;
+	if (req.query.audio === "false")
+		requestAudio = false;
+	let id2;
+	if (requestAudio)
+		id2 = await postAudioReq(null, req.currentFilename);
+	res.json({ id1: job.id, id2 });
 }
 
 exports.describe = async (req, res) => {
@@ -59,7 +67,13 @@ exports.describe = async (req, res) => {
 		url: req.query.url, 
 		describer: req.query.describer
 	});
-	res.json({ id: job.id });
+	let requestAudio = true;
+	if (req.query.audio === "false")
+		requestAudio = false;
+	let id2;
+	if (requestAudio)
+		id2 = await postAudioReq(req.query.url);
+	res.json({ id1: parseInt(job.id), id2 });
 }
 
 exports.status = async (req, res) => {
