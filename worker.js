@@ -144,10 +144,14 @@ function start() {
 				ocrs = ocrs.map((line, idx) => { 
 					return { "time": Math.round(scenes[idx]*1000), "ocr": line }
 				});
+				captions = captions.map((cap, idx) => {
+					cap.ocr = ocrs[idx].ocr;
+					return cap;
+				});
 
 				for(;progress < prog[7]; progress += 1) job.progress(progress);
 
-				let responseFinal = { "captions": captions, "ocr": ocrs };
+				let responseFinal = { "captions": captions };
 				if (process.env.DEBUG_SAM && process.env.DEBUG_VERBOSE)
 					console.log("Final response: \n", responseFinal);
 				job.log("Final response ready.");
@@ -259,9 +263,14 @@ function start() {
 			ocrs = ocrs.map((line, idx) => { 
 				return { "time": Math.round(scenes[idx]*1000), "ocr": line }
 			});
+
+			captions = captions.map((cap, idx) => {
+				cap.ocr = ocrs[idx].ocr;
+				return cap;
+			});
 			for(;progress < prog[6]; progress += 1) job.progress(progress);
 
-			let responseFinal = { "captions": captions, "ocr": ocrs };
+			let responseFinal = { "captions": captions };
 			if (process.env.DEBUG_SAM && process.env.DEBUG_VERBOSE)
 				console.log("Final response: \n", responseFinal); 
 			job.log("Final response ready.");
