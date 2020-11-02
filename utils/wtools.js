@@ -1,4 +1,5 @@
-const https = require ("https");
+const https = require ('https');
+const http = require ('http');
 const fs = require ('fs');
 const path = require ('path');
 
@@ -22,6 +23,9 @@ exports.fetchVideo = function (url) {
     let currentFilename = 'video-' + uniqueSuffix + ".mp4";
     let dest = path.join(__dirname, "..", "uploads", "tmp", currentFilename);
     let conf = { filter: format => format.container === 'mp4' };
+
+    if (urlv.protocol == "http:")
+        https = http;
 
     if (urlv.host === "www.youtube.com") {
         return new Promise(async (resolve, reject) => {
