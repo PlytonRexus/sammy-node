@@ -101,59 +101,61 @@ exports.describeSingleFrame = async (req, res) => {
 	if (!q.timestamp || !q.timestamp.length) {
 		return res.json({ "Error": "No timestamp provided" });
 	}
+
+	res.json({ caption: "This is something google slides prototype presentation template google slides prototype presentation template... qwertyuiop" });
 	// let vidAddr = xtools.toBinary(q.video);
-	let time = parseInt(q.timestamp),
-		scenes = [time],
-		urlv;
-	try {
-		urlv = new URL(q.url);
-	} catch(e) {
-		res.json({ "Error": "Illegal URL used" });
-	}
+	// let time = parseInt(q.timestamp),
+	// 	scenes = [time],
+	// 	urlv;
+	// try {
+	// 	urlv = new URL(q.url);
+	// } catch(e) {
+	// 	res.json({ "Error": "Illegal URL used" });
+	// }
 
-	if (urlv) {
-		vidAddr = await fetchVideo(urlv.href);
-	}
+	// if (urlv) {
+	// 	vidAddr = await fetchVideo(urlv.href);
+	// }
 
-	console.log("Now attempting:", vidAddr);
-	try	{
-		let frameObject = await vtools.extractFrames(vidAddr, [time]);
-		let compressedImage = await xtools.sharpValidation(
-			path.join(
-				__dirname, 
-				"..", 
-				"uploads", 
-				"jpg", 
-				"frame-" + frameObject.suffix + `-1.jpg`
-			), "image/jpg"
-		);
-		let captions = await vtools.getCaptionFromAzure(null, [compressedImage]);
-		captions = captions.map(function (cap, idx) {
-			return { 
-				time: Math.round(scenes[idx]*1000), 
-				captions: cap.caption, 
-				tags: cap.tags 
-			};
-		});
+	// console.log("Now attempting:", vidAddr);
+	// try	{
+	// 	let frameObject = await vtools.extractFrames(vidAddr, [time]);
+	// 	let compressedImage = await xtools.sharpValidation(
+	// 		path.join(
+	// 			__dirname, 
+	// 			"..", 
+	// 			"uploads", 
+	// 			"jpg", 
+	// 			"frame-" + frameObject.suffix + `-1.jpg`
+	// 		), "image/jpg"
+	// 	);
+	// 	let captions = await vtools.getCaptionFromAzure(null, [compressedImage]);
+	// 	captions = captions.map(function (cap, idx) {
+	// 		return { 
+	// 			time: Math.round(scenes[idx]*1000), 
+	// 			captions: cap.caption, 
+	// 			tags: cap.tags 
+	// 		};
+	// 	});
 
-		let ocrs = await vtools.getOCR(null, [compressedImage]);
-		ocrs = ocrs.map((line, idx) => { 
-			return { "time": Math.round(scenes[idx]*1000), "ocr": line }
-		});
-		captions = captions.map((cap, idx) => {
-			cap.ocr = ocrs[idx].ocr;
-			return cap;
-		});
+	// 	let ocrs = await vtools.getOCR(null, [compressedImage]);
+	// 	ocrs = ocrs.map((line, idx) => { 
+	// 		return { "time": Math.round(scenes[idx]*1000), "ocr": line }
+	// 	});
+	// 	captions = captions.map((cap, idx) => {
+	// 		cap.ocr = ocrs[idx].ocr;
+	// 		return cap;
+	// 	});
 
-		if (q.onlyString == "true" || q.stringOnly == "true") {
-			res.json({ caption: `${captions[0].captions}...; ${captions[0].ocr}` });
-		} else {
-			res.json(captions[0]);
-		}
-	} catch (e) {
-		console.log("Error in singleFrame route", e);
-		res.status(500).json({ "Error": e });
-	}
+	// 	if (q.onlyString == "true" || q.stringOnly == "true") {
+	// 		res.json({ caption: `${captions[0].captions}...; ${captions[0].ocr}` });
+	// 	} else {
+	// 		res.json(captions[0]);
+	// 	}
+	// } catch (e) {
+	// 	console.log("Error in singleFrame route", e);
+	// 	res.status(500).json({ "Error": e });
+	// }
 }
 
 /*up
