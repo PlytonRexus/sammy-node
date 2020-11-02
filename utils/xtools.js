@@ -5,7 +5,13 @@ const fs = require ('fs');
 const fea = require ('ffmpeg-extract-audio');
 // For image compression
 const sharp = require ('sharp');
-
+/**
+ * Extracts audio from the provided video in
+ * .wav format and stores in /uploads/tmp
+ *
+ * @param {string} addr
+ * @returns {Promise<string>} Path to the extracted audio
+ */
 exports.extractAV = function(addr) {
 	// This should probably be in `vtools.js`
 	// ffmpeg-extract-audio
@@ -32,11 +38,13 @@ exports.extractAV = function(addr) {
 
 /**
  * Validates supplied imaged buffer by resizing image to
- * 500px * 500px. This function uses Sharp Module for validation.
+ * 700px * 700px. This function uses Sharp Module for validation
+ * 
+ * Usable only for image/jpg
  *
- * @param {*} original path to image
- * @param {*} mimetype string: "image/png", "image/jpg", "image/tiff", "image/bmp"
- * @returns validated buffer of supplied image buffer.
+ * @param {string} original path to image
+ * @param {string} mimetype "image/png", "image/jpg", "image/tiff", "image/bmp"
+ * @returns {Promise<string>} Path to supplied image
  */
 exports.sharpValidation = async function (original, mimetype) {
 	var opts = { quality: 60 };
@@ -59,7 +67,8 @@ exports.sharpValidation = async function (original, mimetype) {
 		}
 
 		if (mimetype == "image/jpg") {
-			if (process.env.DEBUG_SAM && process.env.VERBOSE_SAM) console.log("Compressing:", original);
+			if (process.env.DEBUG_SAM && process.env.VERBOSE_SAM) 
+				console.log("Compressing:", original);
 			buffer = await sharp(original)
 			.resize({
 				width: 700,
@@ -109,12 +118,22 @@ exports.sharpValidation = async function (original, mimetype) {
 
 	});
 }
-
+/**
+ * For generating timeouts using promises
+ *
+ * @param {number} ms time in milliseconds
+ * @returns {Promise<void>}
+ */
 exports.delay = function (ms) {
 	if (process.env.DEBUG_SAM) console.log("Waiting " + ms/1000 + " seconds.");
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
-
+/**
+ * Deletes the file at the provided path
+ *
+ * @param {string} filePath
+ * @returns {Promise<void>}
+ */
 const deleteFile = function(filePath) {
 	return new Promise((resolve, reject) => {
 		fs.unlink(filePath, (err) => {
@@ -126,7 +145,13 @@ const deleteFile = function(filePath) {
 		});
 	})
 }
-
+exports.deleteFile = deleteFile;
+/**
+ * Deletes all files at the provided paths
+ *
+ * @param {Array<string>} filePaths
+ * @returns {Promise<Array<string>} Array of paths deleted
+ */
 exports.deleteManyFiles = function(filePaths) {
 	return new Promise(async (resolve, reject) => {
 		if (!filePaths)
@@ -151,12 +176,24 @@ exports.redisOpts = {
 		lockDuration: 12e4
 	}
 };
-
+/**
+ * Converts a binary string to base64 string
+ * Equivalent to btoa()
+ * 
+ * @param {string} binaryString
+ * @returns {string} Base64 string
+ */
 exports.toBase64 = function(binaryString) {
 	let buff = Buffer.from(binaryString);
 	return buff.toString("base64");
 }
-
+/**
+ * Converts a base64 string to binary string
+ * Equivalent to atob()
+ * 
+ * @param {string} base64String
+ * @returns {string} Binary string
+ */
 exports.toBinary = function(base64String) {
 	let buff = Buffer.from(base64String, "base64");
 	return buff.toString("ascii");

@@ -13,7 +13,13 @@ const tesseract = require("node-tesseract-ocr");
 const ffmpeg = require('fluent-ffmpeg');
 // for azure
 const fetch = require('node-fetch');
-
+/**
+ * Returns the duration of the supplied video
+ * Uses ffmpeg and ffprobe
+ * 
+ * @param {string} filePath
+ * @returns {Promise<number>} Duration
+ */
 exports.getDuration = function (filePath) {
 	return new Promise((resolve, reject) => {
 		ffmpeg.ffprobe(filePath, (error, metadata) => {
@@ -28,7 +34,16 @@ exports.getDuration = function (filePath) {
 		});
 	});
 }
-
+/**
+ * Returns an array of timestamps corresponding to
+ * scene changes in the video
+ * Uses ffmpeg
+ * **Experimental**
+ *
+ * @param {string} filePath
+ * @param {number} [filterSize=0.1]
+ * @returns {Promise<Array<number>>} Array of timestamps
+ */
 exports.extractScenes = function (filePath, filterSize = 0.1) {
 	return new Promise((resolve, reject) => {
 		ds_f(filePath, filterSize)
@@ -41,7 +56,15 @@ exports.extractScenes = function (filePath, filterSize = 0.1) {
 		});
 	})
 }
-
+/**
+ * Returns an object containing the suffix of the extracted
+ * frames and the number of frames extracted
+ * Uses ffmpeg
+ *
+ * @param {string} filePath
+ * @param {Array<string>} arrOfScenes
+ * @returns {Promise<object>} { suffix, numberOfFrames }
+ */
 exports.extractFrames = function(filePath, arrOfScenes) {
 	return new Promise((resolve, reject) => {
 		let uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -66,7 +89,16 @@ exports.extractFrames = function(filePath, arrOfScenes) {
 		});
 	});
 }
-
+/**
+ * Returns an array of captions for the provided images
+ * Uses deepAI
+ * Makes calls to DenseCap API, internet required
+ * Terribly inaccurate
+ *
+ * @param {string} filePath
+ * @param {Array<string>} filePaths
+ * @returns {Promise<Array<object>>|Promise<object>} captions
+ */
 exports.getCaption = function(filePath, filePaths) {
 	return new Promise(async (resolve, reject) => {
 
@@ -100,7 +132,15 @@ exports.getCaption = function(filePath, filePaths) {
 		}
 	});
 };
-
+/**
+ * Returns OCR strings of provided images
+ * Uses Tesseract
+ * No internet connection
+ *
+ * @param {string} filePath
+ * @param {Array<string>} filePaths
+ * @returns {Promise<Array<string>>|Promise<string>} OCR response
+ */
 exports.getOCR = function(filePath, filePaths) {
 	return new Promise(async (resolve, reject) => {
 		const config = {
@@ -132,7 +172,16 @@ exports.getOCR = function(filePath, filePaths) {
 		}
 	});
 }
-
+/**
+ * Returns an array of captions for the provided images
+ * Uses fetch
+ * Makes calls to Azure CV, internet required
+ * Far more accurate than getCaptions()
+ * 
+ * @param {*} filePath
+ * @param {*} filePaths
+ * @returns
+ */
 exports.getCaptionFromAzure = function(filePath, filePaths) {
 	return new Promise(async (resolve, reject) => {
 		async function getCaptionsForOne(p) {

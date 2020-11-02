@@ -110,7 +110,7 @@ function start() {
 
 				let captions = [];
 				let describer = q.describer || "azure";
-				if (q.describer == "densecap") {
+				if (describer == "densecap") {
 					captions = await vtools.getCaption(null, compressed);
 					captions = captions.map(function (cap, idx) {
 						return { time: Math.round(scenes[idx]*1000), captions: cap[0].caption };
@@ -239,7 +239,7 @@ function start() {
 
 			let captions = [];
 			let describer = q.describer || "azure";
-			if (q.describer == "densecap") {
+			if (describer == "densecap") {
 				captions = await vtools.getCaption(null, compressed);
 				captions = captions.map(function (cap, idx) {
 					return { time: Math.round(scenes[idx]*1000), caption: cap[0].caption };

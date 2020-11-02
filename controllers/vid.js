@@ -2,7 +2,7 @@ const path = require('path');
 
 const Queue = require('bull');
 
-const { postAudioReq } = require('../utils/wtools');
+const { postAudioReq, fetchVideo } = require('../utils/wtools');
 const xtools = require('../utils/xtools');
 const vtools = require('../utils/vtools');
 
@@ -95,15 +95,25 @@ exports.status = async (req, res) => {
 
 exports.describeSingleFrame = async (req, res) => {
 	let q = req.query;
-	if (!q.video || !q.video.length) {
-		return res.json({ "Error": "No address provided" });
+	if (!q.url || !q.url.length) {
+		return res.json({ "Error": "No URL provided" });
 	}
 	if (!q.timestamp || !q.timestamp.length) {
 		return res.json({ "Error": "No timestamp provided" });
 	}
-	let vidAddr = xtools.toBinary(q.video),
-		time = parseInt(q.timestamp),
-		scenes = [time];
+	// let vidAddr = xtools.toBinary(q.video);
+	let time = parseInt(q.timestamp),
+		scenes = [time],
+		urlv;
+	try {
+		urlv = new URL(q.url);
+	} catch(e) {
+		res.json({ "Error": "Illegal URL used" });
+	}
+
+	if (urlv) {
+		vidAddr = await fetchVideo(urlv.href);
+	}
 
 	console.log("Now attempting:", vidAddr);
 	try	{

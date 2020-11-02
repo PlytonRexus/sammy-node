@@ -4,7 +4,18 @@ const path = require ('path');
 
 const ytdl = require ("ytdl-core");
 const fetch = require ("node-fetch");
-
+/**
+ * Downloads .mp4 video from provided URL and returns
+ * the file path of the local copy
+ * Uses https.get(), requires internet
+ * Can manage youtube files with hosts: www.youtube.com
+ * and youtu.be
+ * 
+ * Stores in /uplods/tmp
+ *
+ * @param {string} url
+ * @returns {Promise<string>} Address of the video
+ */
 exports.fetchVideo = function (url) {
     let urlv = new URL(url);
     let uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -56,7 +67,8 @@ exports.fetchVideo = function (url) {
                 else {
                     file.close();
                     fs.unlink(dest, () => {}); // Delete temp file
-                    reject(`Server responded with ${response.statusCode}: ${response.statusMessage}`);
+                    reject
+                    (`Server responded with ${response.statusCode}: ${response.statusMessage}`);
                 }
             }).on("error", err => {
                 file.close();
@@ -86,22 +98,39 @@ exports.fetchVideo = function (url) {
         });
     }
 }
-
+/**
+ * Converts a local address to a URL in the format
+ * https://sm-web2.herokuapp.com/uploads/tmp/example.mp4 (by default)
+ *
+ * @param {string} addr
+ * @param {string} [origin="https://sm-web2.herokuapp.com"]
+ * @returns {URL|null} A URL instance of the address
+ */
 const addrToUrl = function(addr, origin = "https://sm-web2.herokuapp.com") {
     let pathname = addr.match(/\/uploads\/tmp\/*/i);
-    if (!pathname)
+    if (pathname)
         return new URL(origin + pathname[0]);
     return null;
 }
-
+/**
+ * Fires a post request to https://sammy-audio.herokuapp.com/vid/link
+ * to create a transcription job for the provided video
+ * Uses fetch, requires internet
+ *
+ * @param {string} url
+ * @param {string} vidAddr
+ * @returns {number} Job ID of the started job at Audio API
+ */
 exports.postAudioReq = async function(url, vidAddr) {
-    let urlv = new URL(url),
+    let urlv, 
         targetUrl = 'https://sammy-audio.herokuapp.com/vid/link';
+    
+    if (url)
+        urlv = new URL(url);
     if (vidAddr)
         urlv = addrToUrl(vidAddr);
+        
     let finalUrl = `${targetUrl}?url=${urlv.href}`;
-
-    console.log("finalUrl:", `${targetUrl}?url=${urlv.href}`);
     let res = await fetch(finalUrl, {
         method: "POST",
         headers: { 
@@ -115,8 +144,18 @@ exports.postAudioReq = async function(url, vidAddr) {
 
     return (parseInt(res.id));
 }
-
-exports.reqTimeout = async function (req, res, next) {
+/**
+ * Sets the request timeout in express for local environments
+ * Won't be useful on platforms with fixed timeouts like Heroku,
+ * but the route will keep working
+ * 
+ * Middleware
+ *
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
+ */
+exports.reqTimeout = function (req, res, next) {
     req.setTimeout(parseInt(process.env.REQUEST_TIMEOUT || 30, 10) * 60 * 1000);
     next();
 }
