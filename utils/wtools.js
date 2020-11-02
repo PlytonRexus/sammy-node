@@ -24,8 +24,8 @@ exports.fetchVideo = function (url) {
     let dest = path.join(__dirname, "..", "uploads", "tmp", currentFilename);
     let conf = { filter: format => format.container === 'mp4' };
 
-    if (urlv.protocol == "http:")
-        https = http;
+    // if (urlv.protocol == "http:")
+    //     https = http;
 
     if (urlv.host === "www.youtube.com") {
         return new Promise(async (resolve, reject) => {
