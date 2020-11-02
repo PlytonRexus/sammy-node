@@ -51,4 +51,6 @@ router.post("/up",
     vid.describeByUpload, vid.uploadErrors
 );
 
+router.get("/single", wtools.reqTimeout, vid.describeSingleFrame);
+
 module.exports = router;

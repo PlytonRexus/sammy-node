@@ -8,14 +8,7 @@ const xtools = require ('./utils/xtools');
 const vtools = require ('./utils/vtools');
 
 let REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
-const opts = {
-	redis: {
-		port: process.env.REDIS_PORT || 6379,
-		host: process.env.REDIS_HOST || '127.0.0.1',
-		db: 0,
-		password: process.env.REDIS_PASS
-	}
-};
+const opts = xtools.redisOpts;
 
 // Spin up multiple processes to handle jobs to 
 // take advantage of more CPU cores
@@ -151,13 +144,23 @@ function start() {
 
 				for(;progress < prog[7]; progress += 1) job.progress(progress);
 
-				let responseFinal = { "captions": captions };
+				let responseFinal = { 
+					file: { 
+						url: url, 
+						savedAs: xtools.toBase64(vidAddr), 
+						length: duration 
+					}, 
+					"captions": captions 
+				};
 				if (process.env.DEBUG_SAM && process.env.DEBUG_VERBOSE)
 					console.log("Final response: \n", responseFinal);
 				job.log("Final response ready.");
 
-				await xtools.deleteManyFiles(toDelete);
-				job.log("Deleting residual files.");
+				if (q.deleteFile) {
+					await xtools.deleteManyFiles(toDelete);
+					job.log("Deleting residual files.");
+				}
+					
 				job.progress(100);
 
 				job.data.responseFinal = responseFinal;
@@ -270,13 +273,23 @@ function start() {
 			});
 			for(;progress < prog[6]; progress += 1) job.progress(progress);
 
-			let responseFinal = { "captions": captions };
+			let responseFinal = { 
+				file: { 
+					url: null, 
+					savedAs: xtools.toBase64(vidAddr), 
+					length: duration 
+				},
+				"captions": captions 
+			};
 			if (process.env.DEBUG_SAM && process.env.DEBUG_VERBOSE)
 				console.log("Final response: \n", responseFinal); 
 			job.log("Final response ready.");
 
-			await xtools.deleteManyFiles(toDelete);
-			job.log("Deleting residual files.");
+			if (q.deleteFile) {
+				await xtools.deleteManyFiles(toDelete);
+				job.log("Deleting residual files.");
+			}
+			
 			job.progress(100);
 			
 			job.data.responseFinal = responseFinal;

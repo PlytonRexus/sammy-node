@@ -2,15 +2,10 @@ const { join } = require ('path');
 
 const Queue = require('bull');
 
+const xtools = require('../utils/xtools');
+
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-const opts = {
-	redis: {
-		port: process.env.REDIS_PORT || 6379,
-		host: process.env.REDIS_HOST || '127.0.0.1',
-		db: 0,
-		password: process.env.REDIS_PASS
-	}
-};
+const opts = xtools.redisOpts;
 const sdQueue = new Queue('sd', opts);
 const upQueue = new Queue('up', opts);
 

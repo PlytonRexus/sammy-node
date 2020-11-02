@@ -3,16 +3,11 @@ const path = require('path');
 const Queue = require('bull');
 
 const { postAudioReq } = require('../utils/wtools');
+const xtools = require('../utils/xtools');
+const vtools = require('../utils/vtools');
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-const opts = {
-	redis: {
-		port: process.env.REDIS_PORT || 6379,
-		host: process.env.REDIS_HOST || '127.0.0.1',
-		db: 0,
-		password: process.env.REDIS_PASS
-	}
-};
+const opts = xtools.redisOpts;
 const sdQueue = new Queue('sd', opts);
 const upQueue = new Queue('up', opts);
 
@@ -51,25 +46,27 @@ exports.uploadErrors = (error, req, res, next) => {
 exports.describeByUpload = async (req, res) => {
 	let job = await upQueue.add({ 
 		currentFilename: req.currentFilename, 
-		describer: req.query.describer 
+		describer: req.query.describer,
+		deleteFile: req.query.deleteFile == 'true'
 	});
-	let requestAudio = true;
-	if (req.query.audio === "false")
-		requestAudio = false;
+	let requestAudio = false;
+	if (req.query.audio === "true")
+		requestAudio = true;
 	let id2;
 	if (requestAudio)
 		id2 = await postAudioReq(null, req.currentFilename);
-	res.json({ id1: job.id, id2 });
+	res.json({ id1: parseInt(job.id), id2 });
 }
 
 exports.describe = async (req, res) => {
 	let job = await sdQueue.add({ 
 		url: req.query.url, 
-		describer: req.query.describer
+		describer: req.query.describer,
+		deleteFile: req.query.deleteFile == 'true'
 	});
-	let requestAudio = true;
-	if (req.query.audio === "false")
-		requestAudio = false;
+	let requestAudio = false;
+	if (req.query.audio === "true")
+		requestAudio = true;
 	let id2;
 	if (requestAudio)
 		id2 = await postAudioReq(req.query.url);
@@ -95,6 +92,56 @@ exports.status = async (req, res) => {
         res.json({ id, state, progress, reason, responseFinal });
     }
 };
+
+exports.describeSingleFrame = async (req, res) => {
+	let q = req.query;
+	if (!q.video || !q.video.length) {
+		return res.json({ "Error": "No address provided" });
+	}
+	if (!q.timestamp || !q.timestamp.length) {
+		return res.json({ "Error": "No timestamp provided" });
+	}
+	let vidAddr = xtools.toBinary(q.video),
+		time = parseInt(q.timestamp),
+		scenes = [time];
+
+	console.log("Now attempting:", vidAddr);
+	try	{
+		let frameObject = await vtools.extractFrames(vidAddr, [time]);
+		let compressedImage = await xtools.sharpValidation(
+			path.join(
+				__dirname, 
+				"..", 
+				"uploads", 
+				"jpg", 
+				"frame-" + frameObject.suffix + `-1.jpg`
+			), "image/jpg"
+		);
+		let captions = await vtools.getCaptionFromAzure(null, [compressedImage]);
+		captions = captions.map(function (cap, idx) {
+			return { 
+				time: Math.round(scenes[idx]*1000), 
+				captions: cap.caption, 
+				tags: cap.tags 
+			};
+		});
+
+		let ocrs = await vtools.getOCR(null, [compressedImage]);
+		ocrs = ocrs.map((line, idx) => { 
+			return { "time": Math.round(scenes[idx]*1000), "ocr": line }
+		});
+		captions = captions.map((cap, idx) => {
+			cap.ocr = ocrs[idx].ocr;
+			return cap;
+		});
+
+		res.json(captions[0]);
+
+	} catch (e) {
+		console.log("Error in singleFrame route", e);
+		res.status(500).json({ "Error": e });
+	}
+}
 
 /*up
 	let vidAddr = req.currentFilename;

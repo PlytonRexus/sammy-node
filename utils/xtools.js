@@ -138,4 +138,26 @@ exports.deleteManyFiles = function(filePaths) {
 			resolve(filePaths);
 		}
 	})
+};
+
+exports.redisOpts = {
+	redis: {
+		port: process.env.REDIS_PORT || 6379,
+		host: process.env.REDIS_HOST || '127.0.0.1',
+		db: 0,
+		password: process.env.REDIS_PASS
+	},
+	settings: {
+		lockDuration: 12e4
+	}
+};
+
+exports.toBase64 = function(binaryString) {
+	let buff = Buffer.from(binaryString);
+	return buff.toString("base64");
+}
+
+exports.toBinary = function(base64String) {
+	let buff = Buffer.from(base64String, "base64");
+	return buff.toString("ascii");
 }
