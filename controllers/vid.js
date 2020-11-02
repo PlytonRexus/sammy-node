@@ -145,8 +145,11 @@ exports.describeSingleFrame = async (req, res) => {
 			return cap;
 		});
 
-		res.json(captions[0]);
-
+		if (q.onlyString == "true" || q.stringOnly == "true") {
+			res.json({ caption: `${captions[0].captions}...; ${captions[0].ocr}` });
+		} else {
+			res.json(captions[0]);
+		}
 	} catch (e) {
 		console.log("Error in singleFrame route", e);
 		res.status(500).json({ "Error": e });

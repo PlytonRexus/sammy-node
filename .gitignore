@@ -1,20 +1,39 @@
+# CP files
 shaash.cp
 /*.cpp
 a.out
 test_case_*.txt
 ts.cpp
 wire.cpp
-meet.js
 nonr2-7.txt
 make.sh
 iofi.cpp
+
+# Meet file
+meet.js
+
+# Node modules
 node_modules
+
+# Sample files
 binaries/samples
 binaries/scorers/*.scorer
 binaries/models/*.pbmm
 binaries/videos/*.mp4
-*.env
 binaries/audios/*.wav
+
+# Environment variables
+*.env
+
+# Uploaded files
 uploads/tmp/*.mp4
 uploads/jpg/*.jpg
+
+# Redis database binaries
 *.rdb
+
+# Nano save files
+*.save
+
+# VS Code setup files
+*.vscode
