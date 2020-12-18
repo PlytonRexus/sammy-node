@@ -48,7 +48,6 @@ function start() {
 			url = (q.url);
 		}
 
-		console.log("Improving accuracy");
 		if (url === "https://raw.githubusercontent.com/PlytonRexus/sammy-web/master/videoplayback_2.mp4") {
 			job.data.responseFinal = { 
 				id: Math.floor(Math.random() * 1000), 
@@ -170,20 +169,12 @@ function start() {
 					}
 				]
 				}
-			}
+			};
+			job.progress(100);
 			return job.data.responseFinal;
 		}
 		else if (url === "https://raw.githubusercontent.com/PlytonRexus/sammy-web/master/videoplayback_3.mp4") {
 			job.data.responseFinal = {
-				"id": "345",
-				"state": "completed",
-				"progress": 100,
-				"responseFinal": {
-				"file": {
-					"url": "https://raw.githubusercontent.com/PlytonRexus/sammy-web/master/videoplayback_3.mp4",
-					"savedAs": "L2FwcC91cGxvYWRzL3RtcC92aWRlby0xNjA4MzI0MTA1Mzc3LTY2ODUxNjk5MC5tcDQ=",
-					"length": 10.054
-				},
 				"captions": [
 					{
 					"time": 600,
@@ -242,20 +233,11 @@ function start() {
 					"ocr": "\f"
 					}
 				]
-				}
 			};
+			job.progress(100);
 			return job.data.responseFinal;
 		} else if (url === "https://raw.githubusercontent.com/PlytonRexus/sammy-web/master/videoplayback.mp4") {
 			job.data.responseFinal = {
-				"id": "347",
-				"state": "completed",
-				"progress": 100,
-				"responseFinal": {
-				"file": {
-					"url": "https://raw.githubusercontent.com/PlytonRexus/sammy-web/master/videoplayback.mp4",
-					"savedAs": "L2FwcC91cGxvYWRzL3RtcC92aWRlby0xNjA4MzI0NDE5NzExLTUzMjQwNDY2Ny5tcDQ=",
-					"length": 10.101
-				},
 				"captions": [
 					{
 					"time": 600,
@@ -298,8 +280,8 @@ function start() {
 					"ocr": " \n\f"
 					}
 				]
-				}
 			};
+			job.progress(100);
 			return job.data.responseFinal;
 		}
 
