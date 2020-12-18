@@ -122,7 +122,7 @@ exports.activateJob = async function(req, res) {
 exports.status = async (req, res) => {
 	let url = req.query.url;
 	if (url === "https://raw.githubusercontent.com/PlytonRexus/sammy-web/master/videoplayback_2.mp4") {
-		res.json({ 
+		return res.json({ 
 			id: Math.floor(Math.random() * 1000), 
 			state: "Completed", 
 			progress: 100, 
@@ -245,7 +245,7 @@ exports.status = async (req, res) => {
 		});
 	}
 	else if (url === "https://raw.githubusercontent.com/PlytonRexus/sammy-web/master/videoplayback_3.mp4") {
-		res.json({
+		return res.json({
 			"id": "345",
 			"state": "completed",
 			"progress": 100,
@@ -316,7 +316,7 @@ exports.status = async (req, res) => {
 			}
 		  });
 	} else if (url === "https://raw.githubusercontent.com/PlytonRexus/sammy-web/master/videoplayback.mp4") {
-		res.json({
+		return res.json({
 			"id": "347",
 			"state": "completed",
 			"progress": 100,
