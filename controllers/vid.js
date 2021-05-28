@@ -101,10 +101,13 @@ exports.describeSingleFrame = async (req, res) => {
 	if (!q.timestamp || !q.timestamp.length) {
 		return res.json({ "Error": "No timestamp provided" });
 	}
+
+	// res.json({ captions: "This is something... qwertyuiop" });
 	// let vidAddr = xtools.toBinary(q.video);
 	let time = parseInt(q.timestamp),
 		scenes = [time],
-		urlv;
+		urlv,
+		vidAddr;
 	try {
 		urlv = new URL(q.url);
 	} catch(e) {
@@ -146,7 +149,8 @@ exports.describeSingleFrame = async (req, res) => {
 		});
 
 		if (q.onlyString == "true" || q.stringOnly == "true") {
-			res.json({ caption: `${captions[0].captions}...; ${captions[0].ocr}` });
+			let tg = captions[0].tags;
+			res.json({ caption: `${captions[0].captions ? captions[0].captions : `${tg[0]} or ${tg[1]} or ${tg[2]}` }...; ${captions[0].ocr}` });
 		} else {
 			res.json(captions[0]);
 		}

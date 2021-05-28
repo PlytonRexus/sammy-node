@@ -120,6 +120,7 @@ exports.activateJob = async function(req, res) {
 }
 
 exports.status = async (req, res) => {
+
     let id = req.params.id;
     let job;
     if (req.query.mode === "sd") {

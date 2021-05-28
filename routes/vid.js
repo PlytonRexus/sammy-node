@@ -19,6 +19,8 @@ const fileFilter = function fileFilter(req, file, callback) {
     }
 }
 
+// a.com/vid/sd?url=youtbe.com&densecap=true
+
 var storage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, path.join(__dirname, "..", "uploads", "tmp"))
