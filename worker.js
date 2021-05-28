@@ -285,7 +285,7 @@ function start() {
 			return job.data.responseFinal;
 		}
 
-		if (url == "") { 
+		if (url === "") {
 			if (process.env.DEBUG_SAM) console.log("`url` parameter empty.");
 			job.log("`url` parameter empty.");
 			throw Error({ "error": "Empty query. Please supply a parameter." });
@@ -405,6 +405,7 @@ function start() {
 				
 				return responseFinal;
 			} catch (e) {
+				job.log(e.message)
 				throw Error(e);
 			}
 		}
@@ -534,6 +535,7 @@ function start() {
 			job.data.responseFinal = responseFinal;
 			return responseFinal;
 		} catch (e) {
+			job.log(e.message)
 			throw Error(e);
 		}
 

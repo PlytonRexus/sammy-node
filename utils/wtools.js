@@ -127,7 +127,7 @@ const addrToUrl = function(addr, origin = "https://sm-web2.herokuapp.com") {
  */
 exports.postAudioReq = async function(url, vidAddr) {
     let urlv, 
-        targetUrl = 'https://sammy-audio.herokuapp.com/vid/link';
+        targetUrl = 'http://20.198.117.128:5000/vid/link';
     
     if (url)
         urlv = new URL(url);
