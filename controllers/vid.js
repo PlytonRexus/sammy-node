@@ -1,15 +1,12 @@
 const path = require('path');
 
-const Queue = require('bull');
-
 const { postAudioReq, fetchVideo } = require('../utils/wtools');
 const xtools = require('../utils/xtools');
 const vtools = require('../utils/vtools');
+const { upQueue, sdQueue } = require('../utils/queues')
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 const opts = xtools.redisOpts;
-const sdQueue = new Queue('sd', opts);
-const upQueue = new Queue('up', opts);
 
 exports.getByUrl = async function(req, res) {
 	res.json({ "Error": "This route has moved to a new address." });

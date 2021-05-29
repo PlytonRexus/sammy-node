@@ -1,7 +1,6 @@
 const path = require ('path');
 
 const throng = require('throng');
-const Queue = require("bull");
 
 const wtools = require ('./utils/wtools');
 const xtools = require ('./utils/xtools');
@@ -21,8 +20,7 @@ let workers = process.env.WEB_CONCURRENCY || 2;
 let maxJobsPerWorker = 10;
 
 // Connect to the named work queue
-let sdQueue = new Queue('sd', opts);
-let upQueue = new Queue('up', opts);
+const { upQueue, sdQueue } = require('./utils/queues');
 
 function start() {
 

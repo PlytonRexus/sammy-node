@@ -1,17 +1,12 @@
 const express = require ('express');
-const Queue = require('bull');
 
 const vid = require ('./routes/vid');
 const job = require ('./routes/job');
 const errors = require ('./routes/errors');
 const xtools = require ('./utils/xtools');
+const { upQueue, sdQueue } = require('./utils/queues')
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-const opts = xtools.redisOpts;
-if (process.env.DEBUG_SAM)
-	console.log(REDIS_URL, process.env.REDIS_PASS);
-const sdQueue = new Queue('sd', opts);
-const upQueue = new Queue('up', opts);
 
 const exp = express();
 
@@ -32,7 +27,7 @@ exp.use("/uploads", express.static("./uploads"));
 exp.use(express.json());
 exp.use(express.urlencoded({ extended: true }));
 
-if (process.env.NODE_ENV == undefined || process.env.NODE_ENV == 'development') {
+if (typeof process.env.NODE_ENV === 'undefined' || process.env.NODE_ENV === 'development') {
     const morgan = require ('morgan');
     exp.use(morgan('dev'));
 }

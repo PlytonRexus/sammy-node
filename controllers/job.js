@@ -1,18 +1,15 @@
 const { join } = require ('path');
 
-const Queue = require('bull');
-
 const xtools = require('../utils/xtools');
+const { upQueue, sdQueue } = require('../utils/queues')
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 const opts = xtools.redisOpts;
-const sdQueue = new Queue('sd', opts);
-const upQueue = new Queue('up', opts);
 
 function getMode(req) {
 	let q = req.query,
 		mode = "sd";
-	if (q.mode == "up")
+	if (q.mode === "up")
 		mode = "up";
 
 	return mode;
@@ -20,9 +17,9 @@ function getMode(req) {
 
 async function doAsyncTree(cbsd, cbup, mode) {
 	let logs;
-	if (mode == "sd") {
+	if (mode === "sd") {
 		logs = await cbsd;
-	} else if (mode == "up") {
+	} else if (mode === "up") {
 		logs = await cbup;
 	}
 
@@ -35,9 +32,9 @@ exports.getLogs = async function(req, res) {
 		logs = { "Error": "Invalid request" };
 
 	try {
-		if (mode == "sd") {
+		if (mode === "sd") {
 			logs = await sdQueue.getJobLogs(id, 0);
-		} else if (mode == "up") {
+		} else if (mode === "up") {
 			logs = await upQueue.getJobLogs(id, 0);
 		}
 
@@ -54,10 +51,10 @@ exports.retryJob = async function(req, res) {
 	let mode = getMode(req),
 		id = req.params.id;
 	try {
-		if (mode == "sd") {
+		if (mode === "sd") {
 			let x = await sdQueue.getJob(id);
 			await x.retry();
-		} else if (mode == "up") {
+		} else if (mode === "up") {
 			let x = await upQueue.getJob(id);
 			await x.retry();
 		}
@@ -72,10 +69,10 @@ exports.removeJob = async function(req, res) {
 	let mode = getMode(req),
 		id = req.params.id;
 	try {
-		if (mode == "sd") {
+		if (mode === "sd") {
 			let x = await sdQueue.getJob(id);
 			await x.remove();
-		} else if (mode == "up") {
+		} else if (mode === "up") {
 			let x = await upQueue.getJob(id);
 			await x.remove();
 		}
@@ -89,7 +86,7 @@ exports.removeJob = async function(req, res) {
 exports.restartQueue = async function(req, res) {
 	let mode = getMode(req);
 	try {
-		if (mode == "sd") {
+		if (mode === "sd") {
 			await sdQueue.pause();
 			await sdQueue.resume();
 		} else if (mode == "up") {
@@ -107,9 +104,9 @@ exports.activateJob = async function(req, res) {
 	let mode = getMode(req),
 		id = req.params.id;
 	try {
-		if (mode == "sd") {
+		if (mode === "sd") {
 			await sdQueue.moveToActive(id);
-		} else if (mode == "up") {
+		} else if (mode === "up") {
 			await upQueue.moveToActive(id);
 		}
 
